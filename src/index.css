@@ -1,0 +1,123 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Midnight Blue */
+@theme {
+  --color-primary: #93C5FD;
+  --color-main: #bbd9ff;
+
+  --color-component: #D6E6FF;
+  --color-component-light-hover: #C4DBFF;
+
+  --color-action: #3B82F6;
+  --color-action-hover: #2563EB;
+  --color-action-light-alt: #60A5FA;
+  --color-action-light-alt-hover: #3B82F6;
+
+
+  --color-hero-action: #0EA5E9;
+  --color-hero-action-hover: #0284C7;
+
+  --color-primary-dark: #0A0F1E;
+  --color-main-dark: #0F1629;
+  --color-component-dark: #151D36;
+  --color-component-hover-dark: #1B2550;
+  --color-action-dark: #1B2550;
+  --color-action-dark-hover: #26336B;
+  --color-nav-dark: #1F2A5A;
+}
+
+/* Midnight Purple */
+@theme-purle {
+  --color-primary: #C7BFFF;
+  --color-main: #E1D9FF;
+
+  --color-component: #ECE8FF;
+  --color-component-light-hover: #DED6FF;
+
+  --color-action: #8B5CF6;
+  --color-action-hover: #7C3AED;
+  --color-action-light-alt: #A78BFA;
+  --color-action-light-alt-hover: #8B5CF6;
+
+  --color-hero-action: #A855F7;
+  --color-hero-action-hover: #9333EA;
+
+  --color-primary-dark: #0D0B1A;
+  --color-main-dark: #141028;
+  --color-component-dark: #1B153A;
+  --color-component-hover-dark: #2A1F5E;
+  --color-action-dark: #2A1F5E;
+  --color-action-dark-hover: #3A2C7A;
+}
+
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
+.animate-modalIn {
+  animation: modalIn 0.25s ease-out forwards;
+}
+
+
+body {
+  font-family: sans-serif;
+}
+
+html.dark {
+  color: white;
+}
+
+
+/* Custom Scrollbar for horizontal sections */
+.custom-scrollbar::-webkit-scrollbar {
+  height: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent; /* makes it blend into background */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(100, 100, 100, 0.5); /* neutral gray */
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(100, 100, 100, 0.8);
+}
+
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(100, 100, 100, 0.5) transparent;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(160, 160, 160, 0.4);
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(160, 160, 160, 0.7);
+}
