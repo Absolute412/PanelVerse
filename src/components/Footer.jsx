@@ -14,7 +14,7 @@ function Footer() {
                 </div>
 
                 <ul className="flex flex-wrap gap-6 text-sm font-semibold">
-                    <li><Link to="#" className="hover:underline">About</Link></li>
+                    <li><Link to="/about" className="hover:underline">About</Link></li>
                     <li><Link to="#" className="hover:underline">Contact</Link></li>
                     <li><Link to="#" className="hover:underline">Terms</Link></li>
                 </ul>

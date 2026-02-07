@@ -107,15 +107,15 @@ const MangaPage = () => {
                         <span className="h-px flex-1 bg-black/20 dark:bg-white/20" />
                     </div>
 
-                    <div className="flex gap-4 bg-white/35 dark:bg-black/30 border border-white/20 dark:border-white/10 rounded-2xl backdrop-blur-md shadow-2xl p-4 sm:p-6 ">
+                    <div className="flex flex-col sm:flex-row gap-4 bg-white/35 dark:bg-black/30 border border-white/20 dark:border-white/10 rounded-2xl backdrop-blur-md shadow-2xl p-4 sm:p-6 ">
                         <div
-                            className="relative group cursor-pointer overflow-hidden rounded-lg"
+                            className="relative group cursor-pointer overflow-hidden rounded-lg w-full max-w-56 self-start sm:self-auto sm:mx-0 sm:w-42"
                             onClick={() => setOpen(true)}
                         >
                             <img 
                                 src={manga.imageThumb}
                                 alt={manga.title} 
-                                className="w-42 h-60 object-cover rounded transition-transform duration-300 group-hover:scale-105"
+                                className="w-full aspect-2/3 sm:h-60 object-cover rounded transition-transform duration-300 group-hover:scale-105"
                             />
 
                             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/60 transition-colors duration-300 flex items-center justify-center">
@@ -126,7 +126,7 @@ const MangaPage = () => {
                             </div>
                         </div>
 
-                        <div className="flex flex-col h-60 flex-1">                        
+                        <div className="flex flex-col sm:h-60 flex-1">                        
                             <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-2 text-gray-800 dark:text-white">
                                 {manga.title}
                             </h2>
@@ -143,15 +143,15 @@ const MangaPage = () => {
                                 )}
                             </div>
 
-                            <p className="mt-1 flex-1 overflow-y-auto pr-2 text-gray-800/90 dark:text-gray-100/90 custom-scrollbar">
+                            <p className="mt-1 flex-1 overflow-y-auto pr-2 text-gray-800/90 dark:text-gray-100/90 custom-scrollbar max-h-40 sm:max-h-40 md:max-h-none">
                                 {manga.description || "No description available."}
                             </p>
 
-                            <div className="mt-4 flex gap-3">
+                            <div className="mt-4 flex flex-col sm:flex-row gap-3">
                                 <Link 
                                     to={chapters.length > 0 ? `/read/${mangaId}/${chapters[0].id}` : "#"}
                                     state={{ chapters, mangaId }}
-                                    className={`px-4 py-2 text-sm font-medium rounded-md transition
+                                    className={`w-full sm:w-auto text-center px-4 py-2 text-sm font-medium rounded-md transition
                                         ${chapters.length === 0
                                             ? "bg-gray-400 dark:bg-gray-600 text-white cursor-not-allowed pointer-events-none"
                                             : "bg-action hover:bg-action-hover dark:bg-action-dark dark:hover:bg-action-dark-hover text-white cursor-pointer"
@@ -161,7 +161,9 @@ const MangaPage = () => {
                                     Read
                                 </Link>
 
-                                <AddButton manga={manga}/>
+                                <div className="w-full sm:w-auto">
+                                    <AddButton manga={manga}/>
+                                </div>
                             </div>
                         </div>
                     </div>
