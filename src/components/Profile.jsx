@@ -41,19 +41,22 @@ function Profile() {
         <div className="min-h-screen flex flex-col bg-main dark:bg-main-dark">
             <Navbar />
 
-            <div className="flex-1 pt-20 dark:bg-main-dark">
-                <div className="flex items-center px-4 sm:px-6 md:px-10 mb-4">
+            <div className="flex-1 pt-20  dark:bg-main-dark">
+                <div className="flex items-center gap-3 w-full max-w-6xl mx-auto px-4 md:px-1 sm:px-6 my-2">
                     <button 
                         onClick={handleBack} 
                         className="
-                            flex items-center gap-1 p-2 text-gray-700 dark:text-white
-                            hover:bg-gray-200/60 dark:hover:bg-gray-500/40
-                            dark:hover:text-gray-400 transition text-md cursor-pointer rounded-full
+                            p-2 rounded-full bg-black/5 dark:bg-white/10 text-gray-700 dark:text-gray-200 
+                            hover:bg-gray-200/60 dark:hover:bg-gray-500/40 transition cursor-pointer
                         "
+                        aria-label="Go back"
                     >
                         <Icon icon="eva:arrow-back-fill"/>
-                </button>
-                    <h2 className="text-gray-700 dark:text-white">Back</h2>
+                    </button>
+                    <span className="text-[11px] font-black tracking-[0.2em] uppercase text-black/70 dark:text-white/70">
+                        Profile
+                    </span>
+                    <span className="h-px flex-1 bg-black/20 dark:bg-white/20" />
                 </div>
                 <div className="px-4 sm:px-6 md:px-10 pb-10">
                     <div className="
@@ -105,6 +108,10 @@ function Profile() {
                             <p className="mt-5 text-sm sm:text-base text-gray-700 dark:text-gray-200 max-w-2xl">
                                 {user.bio}
                             </p>
+                            <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-amber-200/70 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-900 shadow-sm dark:border-amber-300/20 dark:bg-amber-400/10 dark:text-amber-100">
+                                <Icon icon="mdi:information-outline" className="text-sm" />
+                                Mock profile data for now
+                            </div>
 
                             <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
                                 {user.stats.map((stat) => (

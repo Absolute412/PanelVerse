@@ -31,9 +31,12 @@ function About() {
                     </div>
 
                     <div className="mt-6 bg-white/35 dark:bg-black/30 border border-white/20 dark:border-white/10 rounded-2xl backdrop-blur-md shadow-2xl p-6 sm:p-8">
-                        <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-                            About PanelVerse
-                        </h1>
+                        <div className="flex items-center gap-2">
+                            <span className="text-[48px]">📦</span>
+                            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+                                PanelVerse
+                            </h1>
+                        </div>
                         <p className="text-black/70 dark:text-white/70 leading-relaxed mt-4">
                             PanelVerse is a lightweight manga reader built with React and Tailwind CSS. 
                             Our goal is simple: give readers a clean, fast, and ad-free place to discover and enjoy their favorite stories - from timeless classics to the latest releases.
@@ -41,6 +44,24 @@ function About() {
                         <p className="text-black/70 dark:text-white/70 leading-relaxed mt-4">
                             We do not host content. We connect you to publicly available sources and help you
                             keep track of what you love, across any device.
+                        </p>
+                    </div>
+
+                    <div className="mt-6 bg-white/35 dark:bg-black/30 border border-white/20 dark:border-white/10 rounded-2xl backdrop-blur-md shadow-2xl p-6 sm:p-8">
+                        <div className="flex items-center gap-2">
+                            <img 
+                                src="\mangadex-v2-svgrepo-com.svg" 
+                                alt="mangadex logo" 
+                                className="w-12 h-12"
+                            />
+                            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+                                Data Source
+                            </h1>
+                        </div>
+                        <p className="text-black/70 dark:text-white/70 leading-relaxed mt-4">
+                            PanelVerse uses the MangaDex API to fetch manga metadata and chapters.
+                            Manga content is provided by third-party scanlation groups via MangaDex.
+                            All rights belong to their respective creators and publishers.
                         </p>
                     </div>
                 </div>

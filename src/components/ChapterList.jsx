@@ -1,3 +1,5 @@
+import { getChapterBadge, getChapterTitle } from "../utils/formatChapter";
+
 const ChapterList = ({chapters = [], loading, onChapterClick}) => {
 
   return (
@@ -23,7 +25,10 @@ const ChapterList = ({chapters = [], loading, onChapterClick}) => {
             </div>
         ) : (
             <ul className="space-y-2 overflow-y-auto w-full max-h-100 custom-scrollbar">
-                {chapters.map((ch) => (
+                {chapters.map((ch) => {
+                    const chapterBadge = getChapterBadge(ch);
+                    const chapterTitle = getChapterTitle(ch);
+                    return (
                     <li
                         key={ch.id}
                         onClick={() => onChapterClick?.(ch.id)}
@@ -32,18 +37,19 @@ const ChapterList = ({chapters = [], loading, onChapterClick}) => {
                         <div className="flex items-center gap-3">
                             {/* Chapter Number Badge */}
                             <span className="w-8 h-8 flex items-center justify-center rounded-full bg-black/5 dark:bg-white/10 text-black/70 dark:text-gray-200 font-semibold text-sm">
-                                {ch.number}
+                                {chapterBadge}
                             </span>
 
                             {/* Chapter Title */}
-                            <span className="text-gray-800 dark:text-gray-200 font-medium">{ch.title}</span>
+                            <span className="text-gray-800 dark:text-gray-200 font-medium">{chapterTitle}</span>
                         </div>
 
                         <div className="text-sm text-gray-700 dark:text-gray-200">
                             {ch.publishedAt}
                         </div>
                     </li>
-                ))}
+                    );
+                })}
             </ul>
         )}
     </div>

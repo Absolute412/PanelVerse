@@ -5,6 +5,7 @@ import { getAllChapters, getChapterPages } from "../api/manga";
 import Navbar from "./Navbar";
 import { Icon } from "@iconify/react";
 import ScrollToTopBtn from "./ScrollToTopBtn";
+import { getChapterLabel } from "../utils/formatChapter";
 
 const ChapterReader = () => {
   const {mangaId, chapterId } = useParams(); // from route like /chapter/:id
@@ -62,6 +63,9 @@ const ChapterReader = () => {
   const nextChapter = 
     currentIndex !== -1 ? chapters[currentIndex + 1] : null;
 
+  const currentChapter = currentIndex !== -1 ? chapters[currentIndex] : null;
+  const chapterLabel = currentChapter ? getChapterLabel(currentChapter) : "";
+
   const handleBack = () => {
     navigate(`/manga/${mangaId}`);
   }
@@ -116,7 +120,7 @@ const ChapterReader = () => {
 
         <div className="flex flex-col items-center bg-main dark:bg-main-dark min-h-screen py-6 gap-4">
           <h2 className="text-gray-800 dark:text-gray-200 font-semibold bg-white/35 dark:bg-black/30 border border-white/20 dark:border-white/10 rounded-full px-4 py-2 backdrop-blur-md shadow-2xl">
-            Chapter {currentIndex !== -1 ? chapters[currentIndex].number || chapters[currentIndex].title : ""}
+            {chapterLabel}
           </h2>
 
           {pages.length === 0 && !loading && (

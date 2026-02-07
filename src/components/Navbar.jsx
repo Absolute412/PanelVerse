@@ -13,7 +13,7 @@ function Navbar() {
             <div className="absolute inset-0 bg-main/60 dark:bg-main-dark/90 backdrop-blur-lg border-b border-white/30 dark:border-white/10 shadow-2xl z-0" />
             <div className="relative z-10 flex items-center justify-between w-full px-4 py-4 sm:px-6 lg:px-6">
                 <Link to="/" className="text-lg sm:text-xl font-black tracking-tight hover:cursor-pointer text-slate-900 dark:text-white hover:text-slate-700 dark:hover:text-gray-300">
-                    PanelVerse
+                    📦PanelVerse
                 </Link>
 
                 <div className="hidden md:flex gap-6 text-lg">
