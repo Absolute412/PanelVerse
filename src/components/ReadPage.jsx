@@ -145,7 +145,6 @@ const ChapterReader = () => {
       <Navbar />
 
       <main className="flex-1 items-center pt-20 bg-main dark:bg-main-dark">
-        {/* <ScrollToTopBtn /> */}
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex items-center gap-3 w-full mb-4">
             <button 
@@ -206,38 +205,42 @@ const ChapterReader = () => {
                 </button>
               </div>
 
-              <div className="bg-white/35 dark:bg-black/30 border border-white/20 dark:border-white/10 rounded-full px-2.5 py-2 backdrop-blur-md shadow-2xl w-[min(56vw,420px)] md:w-auto">
+              <div className="bg-white/35 dark:bg-black/30 border border-white/20 dark:border-white/10 rounded-full px-2.5 py-2 backdrop-blur-md shadow-2xl w-[min(52vw,360px)] md:w-auto">
                 <div className="flex items-center gap-2 sm:gap-3">
-                  <span className="text-[10px] sm:text-xs font-semibold text-gray-600 dark:text-gray-300 tabular-nums">
+                  <span className="text-[10px] sm:text-xs font-semibold text-gray-600 dark:text-gray-300 tabular-nums min-w-5 text-left">
                     {activeIdx + 1}
                   </span>
-                  {getVisiblePagination(pages.length, activeIdx).map((idx, i, arr) => {
-                    const prev = arr[i - 1];
-                    const needsGap = typeof prev === "number" && idx - prev > 1;
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-center gap-2 overflow-hidden">
+                      {getVisiblePagination(pages.length, activeIdx).map((idx, i, arr) => {
+                        const prev = arr[i - 1];
+                        const needsGap = typeof prev === "number" && idx - prev > 1;
 
-                    return (
-                      <span key={idx} className="flex items-center gap-2">
-                        {needsGap && (
-                          <span className="text-xs text-gray-500 dark:text-gray-400">...</span>
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => scrollToPage(idx)}
-                          className="p-2 -m-2"
-                          aria-label={`Go to page ${idx + 1}`}
-                        >
-                          <span
-                            className={`block h-2 w-2 rounded-full transition-all duration-300 ${
-                              idx === activeIdx
-                                ? "w-8 bg-main dark:bg-main-dark"
-                                : "bg-main/30 dark:bg-main-dark/30 hover:bg-main/50 dark:hover:bg-main-dark/50"
-                            }`}
-                          />
-                        </button>
-                      </span>
-                    );
-                  })}
-                  <span className="text-[10px] sm:text-xs font-semibold text-gray-600 dark:text-gray-300 tabular-nums">
+                        return (
+                          <span key={idx} className="flex items-center gap-2">
+                            {needsGap && (
+                              <span className="text-xs text-gray-500 dark:text-gray-400">...</span>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => scrollToPage(idx)}
+                              className="p-2 -m-2"
+                              aria-label={`Go to page ${idx + 1}`}
+                            >
+                              <span
+                                className={`block h-2 w-2 rounded-full transition-all duration-300 ${
+                                  idx === activeIdx
+                                    ? "w-8 bg-main dark:bg-main-dark"
+                                    : "bg-main/30 dark:bg-main-dark/30 hover:bg-main/50 dark:hover:bg-main-dark/50"
+                                }`}
+                              />
+                            </button>
+                          </span>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <span className="text-[10px] sm:text-xs font-semibold text-gray-600 dark:text-gray-300 tabular-nums min-w-5 text-right">
                     {pages.length}
                   </span>
                 </div>
