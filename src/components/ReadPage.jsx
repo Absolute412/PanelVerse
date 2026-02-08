@@ -1,10 +1,9 @@
 // src/pages/ChapterReader.jsx
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { getAllChapters, getChapterPages } from "../api/manga";
 import Navbar from "./Navbar";
 import { Icon } from "@iconify/react";
-import ScrollToTopBtn from "./ScrollToTopBtn";
 import { getChapterLabel } from "../utils/formatChapter";
 
 const ChapterReader = () => {
@@ -66,6 +65,51 @@ const ChapterReader = () => {
   const currentChapter = currentIndex !== -1 ? chapters[currentIndex] : null;
   const chapterLabel = currentChapter ? getChapterLabel(currentChapter) : "";
 
+  const [activeIdx, setActiveIdx] = useState(0);
+  const pageRefs = useRef([]);
+
+  const scrollToPage = (idx) => {
+    const target = pageRefs.current[idx];
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+      setActiveIdx(idx);
+    }
+  };
+
+  const getVisiblePagination = (total, active) => {
+    if (total <= 7) return Array.from({ length: total }, (_, i) => i);
+
+    const items = new Set([0, total - 1]);
+    for (let i = active - 2; i <= active + 2; i++) {
+      if (i > 0 && i < total - 1) items.add(i);
+    }
+
+    return Array.from(items).sort((a, b) => a - b);
+  };
+
+  useEffect(() => {
+    if (!pages.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+        if (visible?.target?.dataset?.index) {
+          setActiveIdx(Number(visible.target.dataset.index));
+        }
+      },
+      { root: null, threshold: 0.35 }
+    );
+
+    pageRefs.current.forEach((el) => {
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, [pages.length]);
+
   const handleBack = () => {
     navigate(`/manga/${mangaId}`);
   }
@@ -101,7 +145,7 @@ const ChapterReader = () => {
       <Navbar />
 
       <main className="flex-1 items-center pt-20 bg-main dark:bg-main-dark">
-        <ScrollToTopBtn />
+        {/* <ScrollToTopBtn /> */}
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex items-center gap-3 w-full mb-4">
             <button 
@@ -132,6 +176,8 @@ const ChapterReader = () => {
           {pages.map((page, i) => (
             <img
               key={i}
+              ref={(el) => (pageRefs.current[i] = el)}
+              data-index={i}
               src={page.image}
               alt={`Page ${i + 1}`}
               className="w-full max-w-3xl rounded-lg shadow-lg"
@@ -139,40 +185,86 @@ const ChapterReader = () => {
             />
           ))}
 
-          <div className="fixed bottom-4 left-4 flex gap-4 z-50 bg-white/35 dark:bg-black/30 border border-white/20 dark:border-white/10 rounded-full px-4 py-2 backdrop-blur-md shadow-2xl">
-            <button 
-              disabled={!prevChapter}
-              onClick={() => 
-                navigate(`/read/${mangaId}/${prevChapter.id}`, {
-                  state: {chapters},
-                })
-              }
-              className={`transition ${
-                prevChapter
-                  ? "text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-gray-400 cursor-pointer"
-                  : "text-gray-400 cursor-not-allowed"
-              }`}
-            >
-              Prev
-            </button>
-            
-            <button 
-              disabled={!nextChapter}
-              onClick={() => 
-                navigate(`/read/${mangaId}/${nextChapter.id}`, {
-                  state: {chapters},
-                })
-              }
-              className={`transition ${
-                nextChapter
-                  ? "text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-gray-400 cursor-pointer"
-                  : "text-gray-400 cursor-not-allowed"
-              }`}
-            >
-              Next
-            </button>
+          {pages.length > 1 && (
+          <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[min(92vw,900px)]">
+            <div className="flex items-center justify-between gap-3">
+              <div className="bg-white/35 dark:bg-black/30 border border-white/20 dark:border-white/10 rounded-full px-4 py-2 backdrop-blur-md shadow-2xl">
+                <button
+                  disabled={!prevChapter}
+                  onClick={() =>
+                    navigate(`/read/${mangaId}/${prevChapter.id}`, {
+                      state: {chapters},
+                    })
+                  }
+                  className={`transition ${
+                    prevChapter
+                      ? "text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-gray-400 cursor-pointer"
+                      : "text-gray-400 cursor-not-allowed"
+                  }`}
+                >
+                  Prev
+                </button>
+              </div>
 
+              <div className="bg-white/35 dark:bg-black/30 border border-white/20 dark:border-white/10 rounded-full px-2.5 py-2 backdrop-blur-md shadow-2xl w-[min(56vw,420px)] md:w-auto">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <span className="text-[10px] sm:text-xs font-semibold text-gray-600 dark:text-gray-300 tabular-nums">
+                    {activeIdx + 1}
+                  </span>
+                  {getVisiblePagination(pages.length, activeIdx).map((idx, i, arr) => {
+                    const prev = arr[i - 1];
+                    const needsGap = typeof prev === "number" && idx - prev > 1;
+
+                    return (
+                      <span key={idx} className="flex items-center gap-2">
+                        {needsGap && (
+                          <span className="text-xs text-gray-500 dark:text-gray-400">...</span>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => scrollToPage(idx)}
+                          className="p-2 -m-2"
+                          aria-label={`Go to page ${idx + 1}`}
+                        >
+                          <span
+                            className={`block h-2 w-2 rounded-full transition-all duration-300 ${
+                              idx === activeIdx
+                                ? "w-8 bg-main dark:bg-main-dark"
+                                : "bg-main/30 dark:bg-main-dark/30 hover:bg-main/50 dark:hover:bg-main-dark/50"
+                            }`}
+                          />
+                        </button>
+                      </span>
+                    );
+                  })}
+                  <span className="text-[10px] sm:text-xs font-semibold text-gray-600 dark:text-gray-300 tabular-nums">
+                    {pages.length}
+                  </span>
+                </div>
+              </div>
+
+              <div className="bg-white/35 dark:bg-black/30 border border-white/20 dark:border-white/10 rounded-full px-4 py-2 backdrop-blur-md shadow-2xl">
+                <button
+                  disabled={!nextChapter}
+                  onClick={() =>
+                    navigate(`/read/${mangaId}/${nextChapter.id}`, {
+                      state: {chapters},
+                    })
+                  }
+                  className={`transition ${
+                    nextChapter
+                      ? "text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-gray-400 cursor-pointer"
+                      : "text-gray-400 cursor-not-allowed"
+                  }`}
+                >
+                  Next
+                </button>
+              </div>
+            </div>
           </div>
+          )}
+
+          
         </div>
       </main>
     </div>
