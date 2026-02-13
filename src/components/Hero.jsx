@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { mangaApi } from "../api";
 import { Icon } from "@iconify/react";
 import { useLibrary } from "../contexts/LibraryContext";
+import HeroSkeleton from "./HeroSkeleton";
 
 function Hero() {
     const [mangas, setMangas] = useState([]);
@@ -46,11 +47,7 @@ function Hero() {
     }, [mangas]);
 
     if (!mangas.length) {
-        return (
-            <section className="relative bg-gray-900 min-h-[calc(80vh-4rem)] flex items-center">
-                <div className="w-full h-full bg-gray-800 animate-pulse" />
-            </section>
-        );
+        return <HeroSkeleton />;
     }
 
     const activeManga = mangas[activeIndex];
