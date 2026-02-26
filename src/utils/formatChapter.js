@@ -13,6 +13,11 @@ const isOneshotText = (text) => {
   return lower.includes("oneshot") || lower.includes("one-shot") || lower.includes("one shot");
 };
 
+const isPlaceholderChapterTitle = (text) => {
+  const value = cleanText(text).toLowerCase();
+  return value === "chapter ?" || value === "ch. ?";
+};
+
 export const getChapterBadge = (chapter) => {
   const number = cleanText(chapter?.number);
   const title = cleanText(chapter?.title);
@@ -28,7 +33,7 @@ export const getChapterBadge = (chapter) => {
 
 export const getChapterTitle = (chapter) => {
   const title = cleanText(chapter?.title);
-  if (title) return title;
+  if (title && !isPlaceholderChapterTitle(title)) return title;
 
   const badge = getChapterBadge(chapter);
   if (badge === "OS") return "Oneshot";
@@ -42,5 +47,6 @@ export const getChapterLabel = (chapter) => {
   if (badge && badge !== "?") return `Chapter ${badge}`;
 
   const title = cleanText(chapter?.title);
-  return title || "Chapter ?";
+  if (title && !isPlaceholderChapterTitle(title)) return title;
+  return "Chapter ?";
 };
