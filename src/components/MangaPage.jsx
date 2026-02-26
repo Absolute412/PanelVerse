@@ -131,7 +131,7 @@ const MangaPage = () => {
                                 {manga.title}
                             </h2>
 
-                            <div className="flex flex-nowrap sm:flex-wrap items-center gap-2 sm:gap-3 text-[10px] sm:text-[12px] font-semibold text-black/70 dark:text-white/70 mb-3 overflow-x-auto custom-scrollbar">
+                            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[10px] sm:text-[12px] font-semibold text-black/70 dark:text-white/70 mb-3">
                                 <span className="px-2 py-0.5 sm:px-3 sm:py-1 rounded-full bg-black/5 dark:bg-white/10 flex items-center gap-1 whitespace-nowrap">
                                     <Icon icon="mdi:account-outline" className="text-sm"/>
                                     {manga.author || "unknown"}
