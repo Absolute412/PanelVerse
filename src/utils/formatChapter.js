@@ -18,7 +18,7 @@ export const getChapterBadge = (chapter) => {
   const title = cleanText(chapter?.title);
 
   if (isMissingNumber(number)) {
-    return isOneshotText(title) ? "OS" : "?";
+    return isOneshotText(title) ? "OS" : "1";
   }
 
   if (isOneshotText(number)) return "OS";
