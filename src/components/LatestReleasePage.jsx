@@ -65,11 +65,11 @@ function LatestReleasePage() {
                 disabled={loading}
                 className="
                   flex items-center gap-1 px-3 py-1.5 text-sm rounded-md
-                  bg-component dark:bg-component-dark hover:bg-component-light-hover
+                  bg-component dark:bg-component-dark hover:bg-primary/60
                   dark:hover:bg-component-hover-dark disabled:opacity-50 cursor-pointer"
               >
-                <Icon icon="material-symbols:refresh" />
-                Refresh
+                {/* <Icon icon="material-symbols:refresh" /> */}
+                Reload
               </button>
             </div>
           </div>

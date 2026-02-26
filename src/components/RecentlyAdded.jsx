@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Icon } from "@iconify/react";
 import { mangaApi } from "../api";
 
-function Popular() {
+function RecentlyAdded() {
   const [mangas, setMangas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -16,12 +16,12 @@ function Popular() {
         setLoading(true);
         setError(null);
   
-        const data = await mangaApi.getPopularManga(LIMIT)
+        const data = await mangaApi.getRecentlyAddedManga(LIMIT)
 
         setMangas(data);
       } catch (err) {
         console.error("Error fetching manga:", err);
-        setError("Failed to load popular manga");
+        setError("Failed to load recently added manga");
       } finally {
         setLoading(false);
       }
@@ -32,10 +32,10 @@ function Popular() {
 
   if (loading) {
     return (
-      <section className="py-12 px-6 bg-main dark:bg-main-dark">
+      <section className="pt-12 px-6 bg-main dark:bg-main-dark">
         <div className="flex justify-center items-center gap-2">
           <Icon icon="eos-icons:loading" className="text-3xl text-blue-400  dark:text-gray-600"/>
-          <p className="text-center text-gray-700 dark:text-white">Loading popular manga...</p>
+          <p className="text-center text-gray-700 dark:text-white">Loading recently added manga...</p>
         </div>
       </section>
     );
@@ -50,16 +50,16 @@ function Popular() {
   }
 
   return (
-    <section className="bg-main dark:bg-main-dark pt-12 px-6 backdrop-blur-sm">
+    <section className="bg-main dark:bg-main-dark py-12 px-6 backdrop-blur-sm">
       <div className="">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3 w-full">
             <span className="text-[11px] font-black tracking-[0.2em] uppercase text-black/70 dark:text-white/70">
-              Popular Manga
+              Recently Added
             </span>
             <span className="h-px flex-1 bg-black/20 dark:bg-white/20" />
           </div>
-          <Link to="/popular">
+          <Link to="/recently-added">
             <div className="flex items-center cursor-pointer group shrink-0">
               <p className="text-sm font-semibold text-gray-600 group-hover:text-gray-800 dark:text-white/80 dark:group-hover:text-white">
                 See all
@@ -103,4 +103,4 @@ function Popular() {
   );
 }
 
-export default Popular;
+export default RecentlyAdded;

@@ -12,6 +12,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import Settings from './components/Settings';
 import Profile from './components/Profile';
 import LatestReleasePage from './components/LatestReleasePage';
+import RecentlyAddedPage from './components/RecentlyAddedPage';
 
 const router = createBrowserRouter([
   {
@@ -33,6 +34,10 @@ const router = createBrowserRouter([
   {
     path: "/latest-release",
     element: <LatestReleasePage />
+  },
+  {
+    path: "recently-added",
+    element: <RecentlyAddedPage />
   },
   {
     path: "/about",

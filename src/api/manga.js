@@ -22,6 +22,11 @@ export const getPopularManga = async (limit = 20, offset = 0) => {
   return fetchJson(url);
 };
 
+export const getRecentlyAddedManga = async (limit = 20, offset = 0) => {
+  const url = `${API_BASE}/recently-added?limit=${limit}&offset=${offset}`;
+  return fetchJson(url);
+};
+
 export const getManga = async (mangaId) => {
   const url = `${API_BASE}/manga/${mangaId}`;
   return fetchJson(url);

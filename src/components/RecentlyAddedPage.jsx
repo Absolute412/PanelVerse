@@ -8,7 +8,7 @@ import ScrollToTopBtn from "./ScrollToTopBtn";
 import { mangaApi } from "../api";
 import SkeletonCard from "./SkeletonCard";
 
-function PopularPage() {
+function RecentlyAddedPage() {
     const [mangas, setMangas] = useState([]);
     const [initialLoading, setInitialLoading] = useState(false);
     const [loadingMore, setLoadingMore] = useState(false);
@@ -30,7 +30,7 @@ function PopularPage() {
     setLoadMoreError(false);
 
     try {
-        const more = await mangaApi.getPopularManga(LIMIT, offset);
+        const more = await mangaApi.getRecentlyAddedManga(LIMIT, offset);
 
         if (more.length === 0) {
         setHasMore(false);
@@ -56,7 +56,7 @@ function PopularPage() {
         setInitialError(null);
         setLoadMoreError(false);
   
-        const data = await mangaApi.getPopularManga(LIMIT);
+        const data = await mangaApi.getRecentlyAddedManga(LIMIT);
         if (active) {
             setMangas(data);
             setOffset(LIMIT);
@@ -111,7 +111,7 @@ function PopularPage() {
                 <div className="flex items-center justify-between my-2">
                     <div className="flex items-center gap-3 w-full">
                         <span className="text-[15px] font-black tracking-[0.2em] uppercase text-black/70 dark:text-white/70">
-                            Popular Manga
+                            Recently Added Manga
                         </span>
                         <span className="h-px flex-1 bg-black/20 dark:bg-white/20" />
                     </div>
@@ -194,4 +194,4 @@ function PopularPage() {
     );
 }
 
-export default PopularPage
+export default RecentlyAddedPage

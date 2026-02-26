@@ -3,6 +3,7 @@ import Hero from "./Hero";
 import LatestRelease from "./LatestRelease";
 import Navbar from "./Navbar";
 import Popular from "./Popular";
+import RecentlyAdded from "./RecentlyAdded";
 
 function Home() {
 
@@ -15,6 +16,7 @@ function Home() {
                     <Hero />
                     <LatestRelease />
                     <Popular />
+                    <RecentlyAdded />
                 </main>
 
                 <Footer />
