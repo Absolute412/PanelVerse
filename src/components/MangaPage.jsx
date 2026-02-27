@@ -32,6 +32,7 @@ const MangaPage = () => {
         setChaptersLoading(true);
         getAllChapters(mangaId)
         .then((data) => {
+            // Sort chapter numbers numerically while keeping non-numeric labels at the end.
             const sortedChapters = [...data].sort((a, b) => {
                 const na = parseFloat(a.number);
                 const nb = parseFloat(b.number);
@@ -127,7 +128,7 @@ const MangaPage = () => {
                         </div>
 
                         <div className="flex flex-col h-56 sm:h-60 min-w-0 flex-1">                        
-                            <h2 className="text-xl sm:text-3xl font-extrabold tracking-tight mb-2 text-gray-800 dark:text-white">
+                            <h2 className="text-base sm:text-3xl font-extrabold tracking-tight mb-2 text-gray-800 dark:text-white">
                                 {manga.title}
                             </h2>
 
@@ -147,11 +148,12 @@ const MangaPage = () => {
                                 {manga.description || "No description available."}
                             </p>
 
-                            <div className="mt-3 flex sm:hidden flex-row gap-2">
+                            {/* Single responsive action row for both mobile and desktop. */}
+                            <div className="mt-3 sm:mt-4 flex flex-row gap-2 sm:gap-3">
                                 <Link 
                                     to={chapters.length > 0 ? `/read/${mangaId}/${chapters[0].id}` : "#"}
                                     state={{ chapters, mangaId }}
-                                    className={`flex-1 text-center px-4 py-2 text-sm font-medium rounded-md transition
+                                    className={`flex-1 sm:flex-none text-center px-2 py-1 sm:px-4 sm:py-2 text-sm font-medium rounded-md transition
                                         ${chapters.length === 0
                                             ? "bg-gray-400 dark:bg-gray-600 text-white cursor-not-allowed pointer-events-none"
                                             : "bg-action hover:bg-action-hover dark:bg-action-dark dark:hover:bg-action-dark-hover text-white cursor-pointer"
@@ -161,27 +163,8 @@ const MangaPage = () => {
                                     Read
                                 </Link>
 
-                                <div className="flex-1 min-w-0">
-                                    <AddButton manga={manga} className="w-full justify-center text-sm"/>
-                                </div>
-                            </div>
-
-                            <div className="hidden sm:flex mt-4 flex-row gap-3">
-                                <Link 
-                                    to={chapters.length > 0 ? `/read/${mangaId}/${chapters[0].id}` : "#"}
-                                    state={{ chapters, mangaId }}
-                                    className={`flex-none text-center px-4 py-2 text-sm font-medium rounded-md transition
-                                        ${chapters.length === 0
-                                            ? "bg-gray-400 dark:bg-gray-600 text-white cursor-not-allowed pointer-events-none"
-                                            : "bg-action hover:bg-action-hover dark:bg-action-dark dark:hover:bg-action-dark-hover text-white cursor-pointer"
-                                        }
-                                    `}
-                                >
-                                    Read
-                                </Link>
-
-                                <div className="flex-none">
-                                    <AddButton manga={manga}/>
+                                <div className="flex-1 sm:flex-none min-w-0">
+                                    <AddButton manga={manga} className="w-full sm:w-auto justify-center text-sm"/>
                                 </div>
                             </div>
                         </div>

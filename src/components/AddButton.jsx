@@ -14,7 +14,7 @@ export const AddButton = ({ manga, className = "" }) => {
             isInLibrary ? removeFromLibrary(manga.id) : addToLibrary(manga)
         }
         className={`
-            px-4 py-2 rounded-md font-semibold bg-black/10 dark:bg-white/10 text-black 
+            px-2 py-1 sm:px-4 sm:py-2 rounded-md font-semibold bg-black/10 dark:bg-white/10 text-black 
             dark:text-white hover:bg-black/20 dark:hover:bg-white/20 flex items-center gap-2 cursor-pointer ${className}
         `}
     >
