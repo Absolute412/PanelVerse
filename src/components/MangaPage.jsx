@@ -225,7 +225,7 @@ const MangaPage = () => {
             >
                 {/* Stop click bubbling */}
                 <div
-                    className="relative max-w-5xl max-h-[90vh] flex items-center justify-center pointer-events-auto"
+                    className="relative w-[85vw] max-w-[85vw] max-h-[70vh] sm:w-auto sm:max-w-5xl sm:max-h-[90vh] flex items-center justify-center pointer-events-auto"
                     role="dialog"
                     aria-modal="true"
                     onClick={(e) => e.stopPropagation()}
@@ -233,13 +233,13 @@ const MangaPage = () => {
                     <img
                         src={manga.imageFull}
                         alt={manga.title}
-                        className="max-w-full max-h-[90vh] object-contain rounded-lg"
+                        className="max-w-full max-h-[70vh] sm:max-h-[90vh] object-contain rounded-lg"
                     />
 
                     {/* Close button */}
                     <button
                         onClick={() => setOpen(false)}
-                        className="absolute -top-4 -right-4 bg-black/70 hover:bg-black text-white p-2 rounded-full"
+                        className="absolute top-2 right-2 sm:-top-4 sm:-right-4 bg-black/70 hover:bg-black text-white p-2 rounded-full"
                         aria-label="Close image"
                     >
                         <Icon 
