@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Footer from "./Footer";
 import Navbar from "./Navbar";
 import { Link } from "react-router-dom";
-import { Icon } from "@iconify/react";
 import Card from "./Card";
 import ScrollToTopBtn from "./ScrollToTopBtn";
 import { mangaApi } from "../api";

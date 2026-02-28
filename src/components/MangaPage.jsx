@@ -144,7 +144,7 @@ const MangaPage = () => {
                                 )}
                             </div>
 
-                            <p className="mt-1 flex-1 overflow-y-auto pr-2 text-sm sm:text-base text-gray-800/90 dark:text-gray-100/90 custom-scrollbar min-h-0 max-h-24 sm:max-h-40 md:max-h-none">
+                            <p className="mt-1 flex-1 overflow-y-auto overflow-x-hidden wrap-break-word pr-2 text-sm sm:text-base text-gray-800/90 dark:text-gray-100/90 custom-scrollbar min-h-0 max-h-24 sm:max-h-40 md:max-h-none">
                                 {manga.description || "No description available."}
                             </p>
 

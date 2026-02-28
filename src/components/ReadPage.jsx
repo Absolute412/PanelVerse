@@ -19,6 +19,8 @@ const ChapterReader = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    // If chapter list wasn't passed through route state, fetch it here
+    // so Prev/Next chapter navigation still works after refresh/direct visit.
     if (chapters.length > 0) return;
 
       getAllChapters(mangaId)
@@ -77,6 +79,7 @@ const ChapterReader = () => {
   };
 
   const getVisiblePagination = (total, active) => {
+    // Collapse pagination for long chapters, but keep neighbors around active page.
     if (total <= 7) return Array.from({ length: total }, (_, i) => i);
 
     const items = new Set([0, total - 1]);
@@ -88,19 +91,39 @@ const ChapterReader = () => {
   };
 
   useEffect(() => {
+    // Reset pagination state when a new chapter is loaded.
+    setActiveIdx(0);
+    pageRefs.current = [];
+  }, [chapterId]);
+
+  useEffect(() => {
     if (!pages.length) return;
 
+    // Tracks which image is "current" while scrolling (works for both manga pages
+    // and extra-tall manhwa/webtoon pages).
     const observer = new IntersectionObserver(
       (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        const visibleEntries = entries.filter((entry) => entry.isIntersecting);
+        if (!visibleEntries.length) return;
 
-        if (visible?.target?.dataset?.index) {
-          setActiveIdx(Number(visible.target.dataset.index));
+        // Pick the page whose center is closest to viewport center.
+        const viewportCenterY = window.innerHeight / 2;
+        const closest = visibleEntries.sort((a, b) => {
+          const aCenter = a.boundingClientRect.top + a.boundingClientRect.height / 2;
+          const bCenter = b.boundingClientRect.top + b.boundingClientRect.height / 2;
+          return Math.abs(aCenter - viewportCenterY) - Math.abs(bCenter - viewportCenterY);
+        })[0];
+
+        const idx = Number(closest?.target?.dataset?.index);
+        if (Number.isFinite(idx)) {
+          setActiveIdx(idx);
         }
       },
-      { root: null, threshold: 0.35 }
+      {
+        root: null,
+        threshold: [0, 0.01, 0.1],
+        rootMargin: "-45% 0px -45% 0px",
+      }
     );
 
     pageRefs.current.forEach((el) => {
@@ -108,7 +131,7 @@ const ChapterReader = () => {
     });
 
     return () => observer.disconnect();
-  }, [pages.length]);
+  }, [pages, chapterId]);
 
   const handleBack = () => {
     navigate(`/manga/${mangaId}`);
@@ -175,6 +198,7 @@ const ChapterReader = () => {
           {pages.map((page, i) => (
             <img
               key={i}
+              // Keep stable refs per page for observer + dot click navigation.
               ref={(el) => (pageRefs.current[i] = el)}
               data-index={i}
               src={page.image}

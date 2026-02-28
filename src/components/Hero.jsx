@@ -97,38 +97,31 @@ function Hero() {
                 </div>
                 {/* Content */}
                 <div className="
-                    flex flex-row flex-wrap sm:flex-nowrap flex-1 justify-between gap-3 sm:gap-6 backdrop-blur-md bg-white/35
-                    dark:bg-black/30 border border-white/20 dark:border-white/10 rounded-2xl shadow-2xl p-4 md:p-8"
-                >
+                    flex flex-col gap-3 sm:gap-4 bg-white/35 dark:bg-black/30 border border-white/20
+                    dark:border-white/10 rounded-2xl backdrop-blur-md shadow-2xl p-4 sm:p-6
+                ">
                     
-                    <div className="z-10 relative">
-                        {/* Manga thumbnail */}
-                        <div className="relative">
-                            <img 
+                    <div className="flex flex-row gap-3 sm:gap-4">
+                        <div className="relative w-32 h-56 sm:w-42 sm:h-auto shrink-0 self-start sm:self-auto sm:mx-0">
+                            <img
                                 src={activeManga.imageMedium}
-                                alt={activeManga.title}  
-                                className="
-                                    w-36 h-56 sm:w-54 sm:h-80 object-cover rounded-xl
-                                    opacity-95 shadow-2xl ring-1 ring-white/40 dark:ring-white/15
-                                "
+                                alt={activeManga.title}
+                                className="w-full h-full sm:h-60 object-cover rounded-lg opacity-95 shadow-2xl ring-1 ring-white/40 dark:ring-white/15"
                             />
                             <div className="
-                                absolute -top-3 -left-3 bg-hero-action dark:bg-action-dark text-gray-100 
-                                text-[10px] font-black px-3 py-1 rounded-full shadow-lg"
-                            >
+                                absolute -top-3 -left-3 bg-hero-action dark:bg-action-dark text-gray-100
+                                text-[10px] font-black px-3 py-1 rounded-full shadow-lg
+                            ">
                                 Trending
                             </div>
                         </div>
-                    </div>
 
-                    {/* Text content */}
-                    <div className="relative flex-1 min-w-0 flex flex-col justify-between">
-                        <div>
-                            <h1 className="text-xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-black dark:text-white mb-2 sm:mb-3 line-clamp-1">
+                        <div className="flex flex-col h-56 sm:h-60 min-w-0 flex-1">
+                            <h1 className="text-base sm:text-3xl font-extrabold tracking-tight mb-2 text-gray-800 dark:text-white line-clamp-1">
                                 {activeManga.title}
                             </h1>
 
-                            <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3 sm:mb-4 text-[10px] sm:text-[12px] font-semibold text-black/70 dark:text-white/70">
+                            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[10px] sm:text-[12px] font-semibold text-black/70 dark:text-white/70 mb-3">
                                 {activeManga.author && (
                                     <span className="px-2 py-0.5 sm:px-3 sm:py-1 rounded-full bg-black/5 dark:bg-white/10 whitespace-nowrap">
                                         {activeManga.author}
@@ -152,78 +145,75 @@ function Hero() {
                                 )}
                             </div>
 
-                            {/* Genres */}
-                            <div className="mb-3 flex flex-wrap gap-2">
-                                {activeManga.genres?.slice(0,6).map((genre, i) => (
-                                    <span 
-                                        key={i} 
-                                        className="
-                                            bg-black/10 dark:bg-white/10 text-black 
-                                            dark:text-gray-200 text-[10px] sm:text-[12px] font-semibold px-2 py-0.5 sm:px-3 sm:py-1 rounded-full whitespace-nowrap
-                                        "
-                                    >
-                                        {genre}
-                                    </span>
-                                ))}
-                            </div>
-
-                            {/* Description */}
-                            <p className="text-sm sm:text-base text-black/90 dark:text-white/90 max-w-full sm:max-w-xl line-clamp-3 sm:line-clamp-4 mb-3 sm:mb-6">
+                            <p className="mt-1 flex-1 overflow-y-auto overflow-x-hidden wrap-break-word pr-1 sm:pr-2 text-sm sm:text-base text-gray-800/90 dark:text-gray-100/90 custom-scrollbar min-h-0 max-h-24 sm:max-h-40 md:max-h-none ">
                                 {activeManga.description || "No description available."}
                             </p>
 
-                            {/* Actions */}
-                            <div className="hidden sm:flex flex-row flex-nowrap items-center gap-2 sm:gap-3">
+                            <div className="hidden sm:flex mt-3 sm:mt-4 flex-row gap-2 sm:gap-3">
                                 <Link
                                     to={`/manga/${activeManga.id}`}
                                     className="
-                                        flex-1 sm:flex-none text-center whitespace-nowrap px-4 sm:px-5 py-2 sm:py-3 text-sm sm:text-base bg-hero-action hover:bg-hero-action-hover dark:bg-action-dark
-                                        dark:hover:bg-action-dark-hover text-gray-100 dark:text-white rounded-md font-semibold
+                                        flex-1 sm:flex-none text-center px-2 py-1 sm:px-4 sm:py-2 text-sm font-medium rounded-md transition
+                                        bg-hero-action hover:bg-hero-action-hover dark:bg-action-dark dark:hover:bg-action-dark-hover text-white cursor-pointer
                                     "
                                 >
                                     Read Now
                                 </Link>
-                                <button 
-                                    onClick={() => 
+                                <button
+                                    onClick={() =>
                                         isInLibrary ? removeFromLibrary(activeManga.id) : addToLibrary(activeManga)
                                     }
                                     className="
-                                        flex-1 sm:flex-none min-w-0 justify-center px-4 sm:px-5 py-2 sm:py-3 text-sm sm:text-base rounded-md font-semibold bg-black/10 dark:bg-white/10 text-black 
-                                        dark:text-white hover:bg-black/20 dark:hover:bg-white/20 flex items-center gap-2 cursor-pointer whitespace-nowrap
+                                        flex-1 sm:flex-none min-w-0 justify-center px-2 py-1 sm:px-4 sm:py-2 text-sm rounded-md font-medium
+                                        bg-black/10 dark:bg-white/10 text-black dark:text-white hover:bg-black/20 dark:hover:bg-white/20
+                                        flex items-center gap-2 cursor-pointer
                                     "
                                 >
-                                    <Icon icon={isInLibrary ?  "ic:round-bookmark-remove" : "ic:round-bookmark-add"} />
-                                    <span className="sm:hidden">{isInLibrary ? "Remove" : "Add"}</span>
+                                    <Icon icon={isInLibrary ? "ic:round-bookmark-remove" : "ic:round-bookmark-add"} />
                                     <span className="hidden sm:inline">{isInLibrary ? "Remove from Library" : "Add to Library"}</span>
                                 </button>
                             </div>
                         </div>
+                    </div>
 
-                        {/* Bottom bar */}
-                        <div className="hidden sm:flex items-center justify-between gap-3 mt-3 sm:mt-4 w-full opacity-90 text-black dark:text-white">
-                            <div className="flex items-center gap-2 shrink-0">
-                                {mangas.map((_, i) => (
-                                    <button
-                                        key={i}
-                                        onClick={() => setActiveIndex(i)}
-                                        className={`h-2.5 w-2.5 rounded-full transition-all ${
-                                            i === activeIndex
-                                                ? "bg-hero-action dark:bg-action-dark scale-110"
-                                                : "bg-black/30 dark:bg-white/30 hover:bg-black/50 dark:hover:bg-white/50"
-                                        }`}
-                                        aria-label={`Go to slide ${i + 1}`}
-                                    />
-                                ))}
-                            </div>
+                    {/* Genres inside glass card */}
+                    <div className="mt-1">
+                        <div className="flex flex-wrap gap-2">
+                            {activeManga.genres?.slice(0, 6).map((genre, i) => (
+                                <span
+                                    key={i}
+                                    className="bg-black/10 dark:bg-white/10 text-black dark:text-gray-200 text-[10px] font-black px-3 py-1 rounded-full"
+                                >
+                                    {genre}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
 
-                            <div className="flex items-center gap-4 w-24 justify-end shrink-0">
-                                <button onClick={handlePrev} className="p-3 hover:bg-gray-200/60 dark:hover:bg-gray-500/40 cursor-pointer rounded-full">
-                                    <Icon icon="ooui:next-rtl" />
-                                </button>
-                                <button onClick={handleNext} className="p-3 hover:bg-gray-200/60 dark:hover:bg-gray-500/40 cursor-pointer rounded-full">
-                                    <Icon icon="ooui:next-ltr" />
-                                </button>
-                            </div>
+                    {/* Bottom bar */}
+                    <div className="hidden sm:flex items-center justify-between gap-3 mt-1 w-full opacity-90 text-black dark:text-white">
+                        <div className="flex items-center gap-2 shrink-0">
+                            {mangas.map((_, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => setActiveIndex(i)}
+                                    className={`h-2.5 w-2.5 rounded-full transition-all ${
+                                        i === activeIndex
+                                            ? "bg-hero-action dark:bg-action-dark scale-110"
+                                            : "bg-black/30 dark:bg-white/30 hover:bg-black/50 dark:hover:bg-white/50"
+                                    }`}
+                                    aria-label={`Go to slide ${i + 1}`}
+                                />
+                            ))}
+                        </div>
+
+                        <div className="flex items-center gap-4 w-24 justify-end shrink-0">
+                            <button onClick={handlePrev} className="p-3 hover:bg-gray-200/60 dark:hover:bg-gray-500/40 cursor-pointer rounded-full">
+                                <Icon icon="ooui:next-rtl" />
+                            </button>
+                            <button onClick={handleNext} className="p-3 hover:bg-gray-200/60 dark:hover:bg-gray-500/40 cursor-pointer rounded-full">
+                                <Icon icon="ooui:next-ltr" />
+                            </button>
                         </div>
                     </div>
                     <div className="flex sm:hidden basis-full items-center gap-2">

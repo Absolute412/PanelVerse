@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Icon } from "@iconify/react";
-
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import Card from "./Card";

@@ -71,7 +71,7 @@ const NavSearch = ({ variant = "desktop", onClose }) => {
                   setSearchTerm(e.target.value)
                   setOpen(true)
                 }}
-                className="flex-1 bg-transparent dark:text-gray-200 placeholder-gray-400 outline-none"
+                className="flex-1 bg-transparent dark:text-gray-200 placeholder-slate-600 outline-none"
             />
         </div>
 
