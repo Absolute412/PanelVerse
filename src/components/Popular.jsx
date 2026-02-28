@@ -97,14 +97,14 @@ function Popular() {
             {mangas.map((manga) => (
               <Link to={`/manga/${manga.id}`} key={manga.id}>
                 <div className="
-                      flex-none w-34 sm:w-60 bg-white/35 dark:bg-black/30 border border-white/20 dark:border-white/10
+                      flex-none w-34 sm:w-58 bg-white/35 dark:bg-black/30 border border-white/20 dark:border-white/10
                       rounded-2xl shadow-2xl hover:shadow-2xl hover:-translate-y-1 cursor-pointer overflow-hidden
                       transition-transform duration-300 backdrop-blur-md">
                   <div className="relative">
                     <img
                       src={manga.imageMedium}
                       alt={manga.title}
-                      className="w-full h-42 sm:h-80 object-cover"
+                      className="w-full h-42 sm:h-78 object-cover"
                     />
                     <div className="absolute inset-x-0 bottom-0 h-16 bg-linear-to-t from-black/60 via-black/10 to-transparent" />
                   </div>

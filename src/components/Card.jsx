@@ -14,7 +14,7 @@ const Card = ({manga, onClick}) => {
         <div className="relative">
             <img 
                 src={manga.imageMedium || manga.imageThumb || "/placeholder.jpg"}
-                className="w-full h-64 object-cover"
+                className="w-full h-42 sm:h-64 object-cover"
                 loading="lazy"
             />
             <div className="absolute inset-x-0 bottom-0 h-16 bg-linear-to-t from-black/60 via-black/10 to-transparent" />
