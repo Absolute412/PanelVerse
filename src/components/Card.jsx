@@ -19,7 +19,7 @@ const Card = ({manga, onClick}) => {
             />
             <div className="absolute inset-x-0 bottom-0 h-16 bg-linear-to-t from-black/60 via-black/10 to-transparent" />
         </div>
-        <div className="p-4 flex items-center">
+        <div className="p-2 sm:p-4 flex items-center">
             <div className="flex-1 min-w-0">
                 <h3 className="text-sm font-semibold text-gray-800 dark:text-white truncate">
                     {manga.title || "Unknown title"}
