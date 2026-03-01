@@ -1,16 +1,16 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { getThemePreference, setThemePreference } from "../utils/storageService";
 
 const ThemeContext = createContext();
 
 export function ThemeProvider({children}) {
     const [isDark, setIsDark] = useState(() => {
-        const savedTheme = localStorage.getItem("theme");
-        return savedTheme === "dark";
+        return getThemePreference() === "dark";
     });
 
     useEffect(() => {
         document.documentElement.classList.toggle("dark", isDark);
-        localStorage.setItem("theme", isDark ? "dark" : "light");
+        setThemePreference(isDark ? "dark" : "light");
     }, [isDark]);
 
     return (

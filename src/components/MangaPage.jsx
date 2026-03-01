@@ -6,6 +6,7 @@ import { Icon } from "@iconify/react";
 import ChapterList from "./ChapterList";
 import { useEffect, useState } from "react";
 import { getAllChapters, getManga } from "../api/manga";
+import { getMangaProgress } from "../utils/storageService";
 
 const MangaPage = () => {
     const navigate = useNavigate();
@@ -71,6 +72,28 @@ const MangaPage = () => {
         const img = new Image();
         img.src = manga.imageFull;
     }, [manga]);
+
+    const getReadingProgress = () => {
+        const progress = getMangaProgress(mangaId);
+        return {
+            currentChapterId: progress.currentChapterId,
+            chapters: progress.chapters || {},
+        };
+    };
+
+    const getResumeChapterId = () => {
+        if (!chapters.length) return null;
+
+        const defaultChapterId = chapters[0].id;
+        const readingProgress = getReadingProgress();
+        const savedChapterId = readingProgress.currentChapterId;
+        const chapterExists = chapters.some((ch) => ch.id === savedChapterId);
+
+        return chapterExists ? savedChapterId : defaultChapterId;
+    };
+
+    const readingProgress = getReadingProgress();
+    const resumeChapterId = getResumeChapterId();
 
 
     if (loading) {
@@ -151,7 +174,7 @@ const MangaPage = () => {
                             {/* Single responsive action row for both mobile and desktop. */}
                             <div className="mt-3 sm:mt-4 flex flex-row gap-2 sm:gap-3">
                                 <Link 
-                                    to={chapters.length > 0 ? `/read/${mangaId}/${chapters[0].id}` : "#"}
+                                    to={resumeChapterId ? `/read/${mangaId}/${resumeChapterId}` : "#"}
                                     state={{ chapters, mangaId }}
                                     className={`flex-1 sm:flex-none text-center px-2 py-1 sm:px-4 sm:py-2 text-sm font-medium rounded-md transition
                                         ${chapters.length === 0
@@ -194,6 +217,8 @@ const MangaPage = () => {
                 <ChapterList 
                     chapters={[...chapters].reverse()}
                     loading={chaptersLoading}
+                    currentChapterId={readingProgress.currentChapterId}
+                    chapterProgress={readingProgress.chapters}
                     onChapterClick={(chapterId) =>
                         navigate(`/read/${manga.id}/${chapterId}`)
                     }

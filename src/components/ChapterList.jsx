@@ -1,6 +1,12 @@
 import { getChapterBadge, getChapterTitle } from "../utils/formatChapter";
 
-const ChapterList = ({chapters = [], loading, onChapterClick}) => {
+const ChapterList = ({
+    chapters = [],
+    loading,
+    onChapterClick,
+    chapterProgress = {},
+    currentChapterId = null
+}) => {
 
   return (
     <div className="mt-8 flex flex-col items-center">
@@ -28,24 +34,65 @@ const ChapterList = ({chapters = [], loading, onChapterClick}) => {
                 {chapters.map((ch) => {
                     const chapterBadge = getChapterBadge(ch);
                     const chapterTitle = getChapterTitle(ch);
+                    const progress = chapterProgress?.[ch.id];
+                    const isCurrent = currentChapterId === ch.id;
+                    const isCompleted = Boolean(progress?.completed);
+                    const hasProgress = Number.isInteger(progress?.lastPage);
+                    const isInProgress = !isCompleted && hasProgress;
+                    const totalPages = Number(progress?.totalPages);
+                    const currentPage = Number(progress?.lastPage) + 1;
+                    const progressLabel =
+                        isInProgress && totalPages > 0
+                            ? `Page ${Math.min(currentPage, totalPages)}/${totalPages}`
+                            : isInProgress
+                                ? "In progress"
+                                : "";
+
+                    const rowStyle = isCurrent
+                        ? "border-action/50 dark:border-action-dark/60 bg-action/10 dark:bg-action-dark/15"
+                        : isCompleted
+                            ? "border-emerald-400/40 dark:border-emerald-500/30 bg-emerald-100/40 dark:bg-emerald-900/20 opacity-80"
+                            : "border-white/20 dark:border-white/10 bg-white/35 dark:bg-black/30";
                     return (
                     <li
                         key={ch.id}
                         onClick={() => onChapterClick?.(ch.id)}
-                        className="flex items-center justify-between p-3 border border-white/20 dark:border-white/10 bg-white/35 dark:bg-black/30 rounded-2xl hover:-translate-y-0.5 cursor-pointer transition-transform backdrop-blur-md shadow-2xl"
+                        className={`p-3 rounded-2xl hover:-translate-y-0.5 cursor-pointer transition-all backdrop-blur-md shadow-2xl border ${rowStyle}`}
                     >
-                        <div className="flex items-center gap-3">
-                            {/* Chapter Number Badge */}
-                            <span className="w-8 h-8 flex items-center justify-center rounded-full bg-black/5 dark:bg-white/10 text-black/70 dark:text-gray-200 font-semibold text-sm">
-                                {chapterBadge}
-                            </span>
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
+                            <div className="flex items-center gap-3 min-w-0">
+                                <span className="w-8 h-8 shrink-0 flex items-center justify-center rounded-full bg-black/5 dark:bg-white/10 text-black/70 dark:text-gray-200 font-semibold text-sm">
+                                    {chapterBadge}
+                                </span>
+                                <div className="min-w-0">
+                                    <span className="block text-gray-800 dark:text-gray-200 font-medium truncate">{chapterTitle}</span>
+                                    {progressLabel && (
+                                        <span className="text-xs text-black/60 dark:text-white/60">{progressLabel}</span>
+                                    )}
+                                </div>
+                            </div>
 
-                            {/* Chapter Title */}
-                            <span className="text-gray-800 dark:text-gray-200 font-medium">{chapterTitle}</span>
-                        </div>
+                            <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-3">
+                                {isCurrent && (
+                                    <span className="text-[10px] sm:text-xs font-semibold px-2 py-1 rounded-full bg-action/20 dark:bg-action-dark/60 text-black/80 dark:text-gray-100">
+                                        Continue
+                                    </span>
+                                )}
+                                {isCompleted && !isCurrent && (
+                                    <span className="text-[10px] sm:text-xs font-semibold px-2 py-1 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300">
+                                        Read
+                                    </span>
+                                )}
+                                {isInProgress && !isCurrent && (
+                                    <span className="text-[10px] sm:text-xs font-semibold px-2 py-1 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300">
+                                        In Progress
+                                    </span>
+                                )}
 
-                        <div className="text-sm text-gray-700 dark:text-gray-200">
-                            {ch.publishedAt}
+                                <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-200 whitespace-nowrap">
+                                    {ch.publishedAt}
+                                </div>
+                            </div>
                         </div>
                     </li>
                     );

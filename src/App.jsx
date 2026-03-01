@@ -1,4 +1,5 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { useEffect } from 'react';
 import Home from './components/Home';
 import Library from './components/Library';
 import Browse from './components/Browse';
@@ -13,6 +14,7 @@ import Settings from './components/Settings';
 import Profile from './components/Profile';
 import LatestReleasePage from './components/LatestReleasePage';
 import RecentlyAddedPage from './components/RecentlyAddedPage';
+import { ensureStorageSchema } from './utils/storageService';
 
 const router = createBrowserRouter([
   {
@@ -62,6 +64,10 @@ const router = createBrowserRouter([
 ]);
 
 export default function App() {
+  useEffect(() => {
+    // Run schema migration once at app boot to keep storage format consistent.
+    ensureStorageSchema();
+  }, []);
 
   return(
     <>

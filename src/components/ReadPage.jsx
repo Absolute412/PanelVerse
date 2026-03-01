@@ -5,6 +5,7 @@ import { getAllChapters, getChapterPages } from "../api/manga";
 import Navbar from "./Navbar";
 import { Icon } from "@iconify/react";
 import { getChapterLabel } from "../utils/formatChapter";
+import { getMangaProgress, setMangaProgress } from "../utils/storageService";
 
 const ChapterReader = () => {
   const {mangaId, chapterId } = useParams(); // from route like /chapter/:id
@@ -68,12 +69,13 @@ const ChapterReader = () => {
   const chapterLabel = currentChapter ? getChapterLabel(currentChapter) : "";
 
   const [activeIdx, setActiveIdx] = useState(0);
+  const [didRestorePage, setDidRestorePage] = useState(false);
   const pageRefs = useRef([]);
 
-  const scrollToPage = (idx) => {
+  const scrollToPage = (idx, behavior = "smooth") => {
     const target = pageRefs.current[idx];
     if (target) {
-      target.scrollIntoView({ behavior: "smooth", block: "start" });
+      target.scrollIntoView({ behavior, block: "start" });
       setActiveIdx(idx);
     }
   };
@@ -93,8 +95,59 @@ const ChapterReader = () => {
   useEffect(() => {
     // Reset pagination state when a new chapter is loaded.
     setActiveIdx(0);
+    setDidRestorePage(false);
     pageRefs.current = [];
   }, [chapterId]);
+
+  useEffect(() => {
+    if (!pages.length || didRestorePage) return;
+
+    const parsed = getMangaProgress(mangaId);
+
+    try {
+      const savedCurrentChapterId = parsed?.currentChapterId || parsed?.chapterId;
+      const savedChapterProgress = parsed?.chapters?.[chapterId];
+      const sameChapter = savedCurrentChapterId === chapterId;
+      const savedPage = Number(
+        savedChapterProgress?.lastPage ?? parsed?.page
+      );
+      const hasValidPage = Number.isInteger(savedPage) && savedPage >= 0 && savedPage < pages.length;
+
+      if (sameChapter && hasValidPage) {
+        scrollToPage(savedPage, "auto");
+      }
+    } catch {
+      // Ignore malformed progress data.
+    } finally {
+      setDidRestorePage(true);
+    }
+  }, [pages, didRestorePage, mangaId, chapterId]);
+
+  useEffect(() => {
+    if (!didRestorePage) return;
+
+    const parsed = getMangaProgress(mangaId);
+
+    const chaptersProgress =
+      parsed?.chapters && typeof parsed.chapters === "object" ? parsed.chapters : {};
+    const updatedAt = Date.now();
+
+    chaptersProgress[chapterId] = {
+      lastPage: activeIdx,
+      totalPages: pages.length,
+      completed: pages.length > 0 && activeIdx >= pages.length - 1,
+      updatedAt,
+    };
+
+    setMangaProgress(mangaId, {
+      ...parsed,
+      currentChapterId: chapterId,
+      chapterId, // legacy compatibility
+      page: activeIdx,
+      updatedAt,
+      chapters: chaptersProgress,
+    });
+  }, [didRestorePage, mangaId, chapterId, activeIdx, pages.length]);
 
   useEffect(() => {
     if (!pages.length) return;

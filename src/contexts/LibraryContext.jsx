@@ -1,12 +1,13 @@
 import { createContext, useContext, useEffect, useState } from "react"
 import { normalizeManga } from "../utils/normalizeManga";
+import { getLibraryData, setLibraryData } from "../utils/storageService";
 
 const LibraryContext = createContext();
 
 export const LibraryProvider = ({children}) => {
     const [library, setLibrary] = useState(() => {
         try {
-            const saved = JSON.parse(localStorage.getItem("library")) || [];
+            const saved = getLibraryData();
             return saved.map(normalizeManga);
         } catch {
             return [];
@@ -14,7 +15,7 @@ export const LibraryProvider = ({children}) => {
     });
 
     useEffect(() => {
-        localStorage.setItem("library", JSON.stringify(library))
+        setLibraryData(library);
     }, [library]);
 
     const addToLibrary = (manga) => {
