@@ -24,6 +24,50 @@ const safeParseJSON = (raw, fallback) => {
   }
 };
 
+const getImageProxyBase = () => {
+  const apiBase = import.meta.env.VITE_API_BASE || "http://localhost:5000/api";
+  if (typeof apiBase === "string" && apiBase.trim()) {
+    return apiBase.replace(/\/$/, "");
+  }
+
+  const backendBase = import.meta.env.VITE_BACKEND_BASE_URL;
+  if (typeof backendBase === "string" && backendBase.trim()) {
+    return `${backendBase.replace(/\/$/, "")}/api`;
+  }
+
+  return "http://localhost:5000/api";
+};
+
+const normalizeImageUrl = (raw) => {
+  if (!raw || typeof raw !== "string") return raw || "/placeholder.jpg";
+
+  try {
+    const parsed = new URL(raw, typeof window !== "undefined" ? window.location.origin : "http://localhost");
+    const isRelativeProxyUrl = raw.startsWith("/api/image");
+    const isLocalProxyHost =
+      parsed.hostname === "localhost" ||
+      parsed.hostname === "127.0.0.1" ||
+      parsed.hostname === "::1";
+
+    if (parsed.pathname === "/api/image" && (isRelativeProxyUrl || isLocalProxyHost)) {
+      const source = parsed.searchParams.get("url");
+      if (!source) return raw;
+      return `${getImageProxyBase()}/image?url=${encodeURIComponent(source)}`;
+    }
+
+    return parsed.toString();
+  } catch {
+    return raw;
+  }
+};
+
+const normalizeLibraryEntry = (manga) => ({
+  ...manga,
+  imageThumb: normalizeImageUrl(manga?.imageThumb || manga?.image),
+  imageMedium: normalizeImageUrl(manga?.imageMedium || manga?.image),
+  imageFull: normalizeImageUrl(manga?.imageFull || manga?.image),
+});
+
 const getProgressKey = (mangaId) => `${PROGRESS_PREFIX}${mangaId}`;
 
 const normalizeChapterProgress = (value) => {
@@ -130,7 +174,15 @@ export const getLibraryData = () => {
   ensureStorageSchema();
   if (!isBrowser()) return [];
   const parsed = safeParseJSON(localStorage.getItem(LIBRARY_KEY), []);
-  return Array.isArray(parsed) ? parsed : [];
+  const list = Array.isArray(parsed) ? parsed : [];
+  const normalized = list.map(normalizeLibraryEntry);
+
+  // Self-heal stale localhost proxy URLs found in imported backups.
+  if (JSON.stringify(normalized) !== JSON.stringify(list)) {
+    localStorage.setItem(LIBRARY_KEY, JSON.stringify(normalized));
+  }
+
+  return normalized;
 };
 
 export const setLibraryData = (library) => {
@@ -151,6 +203,47 @@ export const setMangaProgress = (mangaId, progress) => {
   if (!isBrowser() || !mangaId) return;
   const normalized = normalizeProgress(progress);
   localStorage.setItem(getProgressKey(mangaId), JSON.stringify(normalized));
+};
+
+export const getContinueReadingItems = (limit = 10) => {
+  ensureStorageSchema();
+  if (!isBrowser()) return [];
+
+  const libraryMap = new Map(getLibraryData().map((manga) => [manga.id, manga]));
+
+  const items = getProgressEntries()
+    .map(([mangaId, key]) => {
+      const parsed = safeParseJSON(localStorage.getItem(key), null);
+      const progress = normalizeProgress(parsed);
+      const currentChapterId = progress.currentChapterId;
+      if (!currentChapterId) return null;
+
+      const chapterProgress = progress.chapters?.[currentChapterId] || null;
+      // If current chapter was fully completed, skip it from Continue Reading rail.
+      if (chapterProgress?.completed) return null;
+
+      const libraryItem = libraryMap.get(mangaId);
+      if (!libraryItem) return null;
+
+      const lastPage = Number(chapterProgress?.lastPage ?? progress.page ?? 0);
+      const totalPages = Number(chapterProgress?.totalPages ?? 0);
+      const updatedAt = Number(chapterProgress?.updatedAt ?? progress.updatedAt ?? 0);
+
+      return {
+        mangaId,
+        title: libraryItem.title || "Unknown title",
+        imageThumb: libraryItem.imageThumb || "/placeholder.jpg",
+        imageMedium: libraryItem.imageMedium || libraryItem.imageThumb || "/placeholder.jpg",
+        currentChapterId,
+        lastPage: Number.isInteger(lastPage) && lastPage >= 0 ? lastPage : 0,
+        totalPages: Number.isInteger(totalPages) && totalPages >= 0 ? totalPages : 0,
+        updatedAt: Number.isFinite(updatedAt) ? updatedAt : 0,
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.updatedAt - a.updatedAt);
+
+  return items.slice(0, Math.max(1, limit));
 };
 
 export const exportStorageData = () => {

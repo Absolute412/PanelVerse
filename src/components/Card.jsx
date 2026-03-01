@@ -1,6 +1,22 @@
+import { useEffect, useMemo, useState } from "react";
 
 const Card = ({manga, onClick}) => {
+    const [imageIndex, setImageIndex] = useState(0);
+    
     if(!manga) return null
+    const imageCandidates = useMemo(
+        () => [manga.imageMedium, manga.imageThumb, manga.imageFull, "/placeholder.jpg"].filter(Boolean),
+        [manga.imageMedium, manga.imageThumb, manga.imageFull]
+    );
+
+    useEffect(() => {
+        // Reset image fallback chain when card data changes.
+        setImageIndex(0);
+    }, [imageCandidates]);
+
+    const handleImageError = () => {
+        setImageIndex((prev) => (prev < imageCandidates.length - 1 ? prev + 1 : prev));
+    };
 
   return (
     <div 
@@ -13,9 +29,11 @@ const Card = ({manga, onClick}) => {
     >
         <div className="relative">
             <img 
-                src={manga.imageMedium || manga.imageThumb || "/placeholder.jpg"}
+                src={imageCandidates[imageIndex]}
+                onError={handleImageError}
                 className="w-full h-42 sm:h-64 object-cover"
                 loading="lazy"
+                alt={manga.title || "Manga cover"}
             />
             <div className="absolute inset-x-0 bottom-0 h-16 bg-linear-to-t from-black/60 via-black/10 to-transparent" />
         </div>

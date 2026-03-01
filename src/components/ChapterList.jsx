@@ -39,6 +39,7 @@ const ChapterList = ({
                     const isCompleted = Boolean(progress?.completed);
                     const hasProgress = Number.isInteger(progress?.lastPage);
                     const isInProgress = !isCompleted && hasProgress;
+                    const showContinue = isCurrent && !isCompleted;
                     const totalPages = Number(progress?.totalPages);
                     const currentPage = Number(progress?.lastPage) + 1;
                     const progressLabel =
@@ -48,7 +49,7 @@ const ChapterList = ({
                                 ? "In progress"
                                 : "";
 
-                    const rowStyle = isCurrent
+                    const rowStyle = showContinue
                         ? "border-action/50 dark:border-action-dark/60 bg-action/10 dark:bg-action-dark/15"
                         : isCompleted
                             ? "border-emerald-400/40 dark:border-emerald-500/30 bg-emerald-100/40 dark:bg-emerald-900/20 opacity-80"
@@ -73,12 +74,12 @@ const ChapterList = ({
                             </div>
 
                             <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-3">
-                                {isCurrent && (
+                                {showContinue && (
                                     <span className="text-[10px] sm:text-xs font-semibold px-2 py-1 rounded-full bg-action/20 dark:bg-action-dark/60 text-black/80 dark:text-gray-100">
                                         Continue
                                     </span>
                                 )}
-                                {isCompleted && !isCurrent && (
+                                {isCompleted && (
                                     <span className="text-[10px] sm:text-xs font-semibold px-2 py-1 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300">
                                         Read
                                     </span>

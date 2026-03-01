@@ -4,6 +4,7 @@ import LatestRelease from "./LatestRelease";
 import Navbar from "./Navbar";
 import Popular from "./Popular";
 import RecentlyAdded from "./RecentlyAdded";
+import ContinueReading from "./ContinueReading";
 
 function Home() {
 
@@ -14,6 +15,7 @@ function Home() {
 
                 <main className="flex-1 pt-16">
                     <Hero />
+                    <ContinueReading />
                     <LatestRelease />
                     <Popular />
                     <RecentlyAdded />
