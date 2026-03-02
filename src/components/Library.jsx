@@ -18,9 +18,9 @@ function Library() {
                             <div className="flex items-center gap-3 w-full">
                                 <div className="flex flex-col ">
                                     <span className="text-[15px] font-black tracking-[0.2em] uppercase text-black/70 dark:text-white/70">
-                                    Library
-                                </span>
-                                <span className="text-[12px] font-light tracking-[0.2em] ">Your saved and downloaded manga</span>
+                                        Library
+                                    </span>
+                                    <span className="text-[12px] font-light tracking-[0.2em] ">Your saved and downloaded manga</span>
                                 </div>
                                 <span className="h-px flex-1 bg-black/20 dark:bg-white/20" />
                             </div>

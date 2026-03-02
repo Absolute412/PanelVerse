@@ -8,6 +8,10 @@ const EMPTY_PROGRESS = {
   schemaVersion: STORAGE_SCHEMA_VERSION,
   currentChapterId: null,
   chapterId: null, // Legacy compatibility for older reads.
+  // Metadata fallback for Continue Reading when manga is not in Library.
+  title: null,
+  imageThumb: "/placeholder.jpg",
+  imageMedium: "/placeholder.jpg",
   page: 0,
   updatedAt: 0,
   chapters: {},
@@ -89,6 +93,12 @@ const normalizeProgress = (rawProgress) => {
   if (!rawProgress || typeof rawProgress !== "object") return { ...EMPTY_PROGRESS };
 
   const currentChapterId = rawProgress.currentChapterId || rawProgress.chapterId || null;
+  // Normalize optional metadata saved from reader/manga page route state.
+  const title = typeof rawProgress.title === "string" && rawProgress.title.trim()
+    ? rawProgress.title.trim()
+    : null;
+  const imageThumb = normalizeImageUrl(rawProgress.imageThumb || rawProgress.image);
+  const imageMedium = normalizeImageUrl(rawProgress.imageMedium || rawProgress.imageThumb || rawProgress.image);
   const page = Number(rawProgress.page);
   const updatedAt = Number(rawProgress.updatedAt);
 
@@ -96,6 +106,9 @@ const normalizeProgress = (rawProgress) => {
     schemaVersion: STORAGE_SCHEMA_VERSION,
     currentChapterId,
     chapterId: currentChapterId,
+    title,
+    imageThumb,
+    imageMedium,
     page: Number.isInteger(page) && page >= 0 ? page : 0,
     updatedAt: Number.isFinite(updatedAt) ? updatedAt : Date.now(),
     chapters: {},
@@ -223,7 +236,7 @@ export const getContinueReadingItems = (limit = 10) => {
       if (chapterProgress?.completed) return null;
 
       const libraryItem = libraryMap.get(mangaId);
-      if (!libraryItem) return null;
+      const fallbackTitle = "Unknown title";
 
       const lastPage = Number(chapterProgress?.lastPage ?? progress.page ?? 0);
       const totalPages = Number(chapterProgress?.totalPages ?? 0);
@@ -231,9 +244,10 @@ export const getContinueReadingItems = (limit = 10) => {
 
       return {
         mangaId,
-        title: libraryItem.title || "Unknown title",
-        imageThumb: libraryItem.imageThumb || "/placeholder.jpg",
-        imageMedium: libraryItem.imageMedium || libraryItem.imageThumb || "/placeholder.jpg",
+        // Prefer Library display data, then progress metadata, then safe fallbacks.
+        title: libraryItem?.title || progress.title || fallbackTitle,
+        imageThumb: libraryItem?.imageThumb || progress.imageThumb || "/placeholder.jpg",
+        imageMedium: libraryItem?.imageMedium || libraryItem?.imageThumb || progress.imageMedium || progress.imageThumb || "/placeholder.jpg",
         currentChapterId,
         lastPage: Number.isInteger(lastPage) && lastPage >= 0 ? lastPage : 0,
         totalPages: Number.isInteger(totalPages) && totalPages >= 0 ? totalPages : 0,

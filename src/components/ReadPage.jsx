@@ -18,6 +18,10 @@ const ChapterReader = () => {
   const [pages, setPages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  // Optional metadata forwarded from MangaPage to persist non-library card info.
+  const mangaMeta = location.state?.manga || null;
+  const hasStoredTitle =
+    typeof mangaMeta?.title === "string" && mangaMeta.title.trim().length > 0;
 
   useEffect(() => {
     // If chapter list wasn't passed through route state, fetch it here
@@ -131,6 +135,12 @@ const ChapterReader = () => {
     const chaptersProgress =
       parsed?.chapters && typeof parsed.chapters === "object" ? parsed.chapters : {};
     const updatedAt = Date.now();
+    const existingTitle = typeof parsed?.title === "string" ? parsed.title.trim() : "";
+    const existingThumb = parsed?.imageThumb;
+    const existingMedium = parsed?.imageMedium;
+    // Treat placeholder images as "missing" so real metadata can replace them.
+    const hasExistingThumb = typeof existingThumb === "string" && existingThumb !== "/placeholder.jpg";
+    const hasExistingMedium = typeof existingMedium === "string" && existingMedium !== "/placeholder.jpg";
 
     chaptersProgress[chapterId] = {
       lastPage: activeIdx,
@@ -143,11 +153,15 @@ const ChapterReader = () => {
       ...parsed,
       currentChapterId: chapterId,
       chapterId, // legacy compatibility
+      // Keep prior real metadata, but fill any missing fields from current route state.
+      title: existingTitle || (hasStoredTitle ? mangaMeta.title.trim() : null),
+      imageThumb: hasExistingThumb ? existingThumb : (mangaMeta?.imageThumb || "/placeholder.jpg"),
+      imageMedium: hasExistingMedium ? existingMedium : (mangaMeta?.imageMedium || mangaMeta?.imageThumb || "/placeholder.jpg"),
       page: activeIdx,
       updatedAt,
       chapters: chaptersProgress,
     });
-  }, [didRestorePage, mangaId, chapterId, activeIdx, pages.length]);
+  }, [didRestorePage, mangaId, chapterId, activeIdx, pages.length, mangaMeta]);
 
   useEffect(() => {
     if (!pages.length) return;
@@ -269,7 +283,7 @@ const ChapterReader = () => {
                   disabled={!prevChapter}
                   onClick={() =>
                     navigate(`/read/${mangaId}/${prevChapter.id}`, {
-                      state: {chapters},
+                      state: { chapters, manga: mangaMeta },
                     })
                   }
                   className={`transition ${
@@ -328,7 +342,7 @@ const ChapterReader = () => {
                   disabled={!nextChapter}
                   onClick={() =>
                     navigate(`/read/${mangaId}/${nextChapter.id}`, {
-                      state: {chapters},
+                      state: { chapters, manga: mangaMeta },
                     })
                   }
                   className={`transition ${

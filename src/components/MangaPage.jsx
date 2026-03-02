@@ -6,7 +6,7 @@ import { Icon } from "@iconify/react";
 import ChapterList from "./ChapterList";
 import { useEffect, useState } from "react";
 import { getAllChapters, getManga } from "../api/manga";
-import { getMangaProgress } from "../utils/storageService";
+import { getMangaProgress, setMangaProgress } from "../utils/storageService";
 
 const MangaPage = () => {
     const navigate = useNavigate();
@@ -73,6 +73,28 @@ const MangaPage = () => {
         img.src = manga.imageFull;
     }, [manga]);
 
+    useEffect(() => {
+        if (!mangaId || !manga) return;
+
+        // Backfill progress metadata so Continue Reading can render non-library manga cards.
+        const progress = getMangaProgress(mangaId);
+        const nextTitle = manga.title || null;
+        const nextThumb = manga.imageThumb || "/placeholder.jpg";
+        const nextMedium = manga.imageMedium || manga.imageThumb || "/placeholder.jpg";
+
+        const sameTitle = (progress?.title || null) === nextTitle;
+        const sameThumb = (progress?.imageThumb || "/placeholder.jpg") === nextThumb;
+        const sameMedium = (progress?.imageMedium || "/placeholder.jpg") === nextMedium;
+        if (sameTitle && sameThumb && sameMedium) return;
+
+        setMangaProgress(mangaId, {
+            ...progress,
+            title: nextTitle,
+            imageThumb: nextThumb,
+            imageMedium: nextMedium,
+        });
+    }, [mangaId, manga]);
+
     const getReadingProgress = () => {
         const progress = getMangaProgress(mangaId);
         return {
@@ -94,6 +116,18 @@ const MangaPage = () => {
 
     const readingProgress = getReadingProgress();
     const resumeChapterId = getResumeChapterId();
+    // Pass manga metadata through route state so reader can persist it with progress updates.
+    const readingState = manga
+        ? {
+            chapters,
+            mangaId,
+            manga: {
+                title: manga.title,
+                imageThumb: manga.imageThumb,
+                imageMedium: manga.imageMedium,
+            },
+        }
+        : { chapters, mangaId };
 
 
     if (loading) {
@@ -175,7 +209,7 @@ const MangaPage = () => {
                             <div className="mt-3 sm:mt-4 flex flex-row gap-2 sm:gap-3">
                                 <Link 
                                     to={resumeChapterId ? `/read/${mangaId}/${resumeChapterId}` : "#"}
-                                    state={{ chapters, mangaId }}
+                                    state={readingState}
                                     className={`flex-1 sm:flex-none text-center px-2 py-1 sm:px-4 sm:py-2 text-sm font-medium rounded-md transition
                                         ${chapters.length === 0
                                             ? "bg-gray-400 dark:bg-gray-600 text-white cursor-not-allowed pointer-events-none"
@@ -220,7 +254,9 @@ const MangaPage = () => {
                     currentChapterId={readingProgress.currentChapterId}
                     chapterProgress={readingProgress.chapters}
                     onChapterClick={(chapterId) =>
-                        navigate(`/read/${manga.id}/${chapterId}`)
+                        navigate(`/read/${manga.id}/${chapterId}`, {
+                            state: readingState,
+                        })
                     }
                 />
             </div>
