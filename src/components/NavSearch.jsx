@@ -61,7 +61,7 @@ const NavSearch = ({ variant = "desktop", onClose }) => {
   if (variant === "desktop") {
     return (
       <div ref={searchRef} className="relative w-full max-w-md">
-        <div className="flex items-center gap-1 bg-main dark:bg-component-dark rounded-lg px-3 py-1 shadow-sm w-full">
+        <div className="flex items-center gap-1 bg-(--main) dark:bg-(--component) rounded-lg px-3 py-1 shadow-sm w-full">
             <Icon icon="ep:search" className="text-slate-600 dark:text-gray-300"/>
             <input
                 type="text" 
@@ -77,7 +77,7 @@ const NavSearch = ({ variant = "desktop", onClose }) => {
 
         {open && searchTerm && (
           <div className="
-              absolute left-0 mt-2 w-full bg-component dark:bg-component-dark rounded-lg
+              absolute left-0 mt-2 w-full bg-(--component) rounded-lg
               shadow-lg max-h-80 overflow-y-auto custom-scrollbar z-50"
           >
             {loading ? (
@@ -87,7 +87,7 @@ const NavSearch = ({ variant = "desktop", onClose }) => {
                 <Link
                   key={manga.id}
                   to={`/manga/${manga.id}`}
-                  className="flex items-center gap-3 p-2 hover:bg-component-light-hover dark:hover:bg-component-hover-dark cursor-pointer"
+                  className="flex items-center gap-3 p-2 hover:bg-(--component-hover) cursor-pointer"
                 >
                   <img 
                     src={manga.imageThumb}

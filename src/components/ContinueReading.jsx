@@ -31,7 +31,7 @@ function ContinueReading() {
   if (!items.length) return null;
 
   return (
-    <section className="bg-main dark:bg-main-dark pt-12 px-6 backdrop-blur-sm">
+    <section className="bg-(--main) pt-12 px-6 backdrop-blur-sm">
       <div>
         <div className="flex items-center gap-3 w-full mb-6">
           <span className="text-[11px] font-black tracking-[0.2em] uppercase text-black/70 dark:text-white/70">

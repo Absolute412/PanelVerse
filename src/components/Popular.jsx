@@ -33,7 +33,7 @@ function Popular() {
 
   if (loading) {
     return (
-      <section className="bg-main dark:bg-main-dark pt-12 px-6 backdrop-blur-sm">
+      <section className="bg-(--main) pt-12 px-6 backdrop-blur-sm">
         <div>
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3 w-full">
@@ -63,14 +63,14 @@ function Popular() {
 
   if (error) {
     return (
-      <section className="py-12 px-6 bg-main dark:bg-main-dark">
+      <section className="py-12 px-6 bg-(--main)">
         <p className="text-center text-red-500">{error}</p>
       </section>
     );
   }
 
   return (
-    <section className="bg-main dark:bg-main-dark pt-12 px-6 backdrop-blur-sm">
+    <section className="bg-(--main) pt-12 px-6 backdrop-blur-sm">
       <div className="">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3 w-full">

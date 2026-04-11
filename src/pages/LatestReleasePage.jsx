@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import Navbar from "./Navbar";
-import Footer from "./Footer";
-import Card from "./Card";
-import ScrollToTopBtn from "./ScrollToTopBtn";
-import SkeletonCard from "./SkeletonCard";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
+import Card from "../components/Card";
+import ScrollToTopBtn from "../components/ScrollToTopBtn";
+import SkeletonCard from "../components/SkeletonCard";
 import { mangaApi } from "../api";
 
 function LatestReleasePage() {
@@ -43,7 +43,7 @@ function LatestReleasePage() {
   }, [refreshKey]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-main dark:bg-main-dark">
+    <div className="min-h-screen flex flex-col bg-(--main)">
       <Navbar />
 
       <div className="flex-1 pt-20 pb-16 px-4 sm:px-6">
@@ -63,8 +63,8 @@ function LatestReleasePage() {
                 disabled={loading}
                 className="
                   flex items-center gap-1 px-3 py-1.5 text-sm rounded-md
-                  bg-component dark:bg-component-dark hover:bg-primary/60
-                  dark:hover:bg-component-hover-dark disabled:opacity-50 cursor-pointer"
+                  bg-(--action) hover:bg-(--action-hover) text-white
+                  disabled:opacity-50 cursor-pointer"
               >
                 {/* <Icon icon="material-symbols:refresh" /> */}
                 Reload
@@ -103,7 +103,7 @@ function LatestReleasePage() {
           {!loading &&
             mangas.map(manga => (
               <Link key={manga.id} to={`/manga/${manga.id}`}>
-                <Card manga={manga} />
+                <Card key={manga.id} manga={manga} />
               </Link>
             ))}
         </div>

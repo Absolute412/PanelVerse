@@ -1,19 +1,19 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { useEffect } from 'react';
-import Home from './components/Home';
-import Library from './components/Library';
-import Browse from './components/Browse';
-import About from './components/About';
+import Home from './pages/Home';
+import Library from './pages/Library';
+import Browse from './pages/Browse';
+import About from './pages/About';
 import { LibraryProvider } from './contexts/LibraryContext';
-import ReadPage from './components/ReadPage';
+import ReadPage from './pages/ReadPage';
 // import { sampleManga } from './data/sampleManga';
-import MangaPage from './components/MangaPage';
-import PopularPage from './components/PopularPage';
+import MangaPage from './pages/MangaPage';
+import PopularPage from './pages/PopularPage';
 import { ThemeProvider } from './contexts/ThemeContext';
-import Settings from './components/Settings';
-import Profile from './components/Profile';
-import LatestReleasePage from './components/LatestReleasePage';
-import RecentlyAddedPage from './components/RecentlyAddedPage';
+import Settings from './pages/Settings';
+import Profile from './pages/Profile';
+import LatestReleasePage from './pages/LatestReleasePage';
+import RecentlyAddedPage from './pages/RecentlyAddedPage';
 import { ensureStorageSchema } from './utils/storageService';
 
 const router = createBrowserRouter([

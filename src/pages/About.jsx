@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import Footer from "./Footer";
-import Navbar from "./Navbar";
+import Footer from "../components/Footer";
+import Navbar from "../components/Navbar";
 import { Icon } from "@iconify/react";
 
 function About() {
@@ -11,7 +11,7 @@ function About() {
     }
 
     return(
-        <div className="min-h-screen flex flex-col bg-main dark:bg-main-dark">
+        <div className="min-h-screen flex flex-col bg-(--main)">
             <Navbar />
 
             <div className="flex-1 pt-20 pb-16 px-4 sm:px-6 ">

@@ -23,7 +23,12 @@ const ChapterList = ({
         {loading ? (
             <p className="text-gray-400 text-sm">Loading chapters...</p>
         ) : chapters.length === 0 ? (
-            <div className="p-4 border border-white/20 dark:border-white/10 bg-white/35 dark:bg-black/30 rounded-2xl text-center text-gray-500 backdrop-blur-md shadow-2xl">
+            <div 
+                className="
+                p-4 border border-white/20 dark:border-white/10 
+                bg-white/35 dark:bg-black/30 rounded-2xl text-center 
+                text-gray-500 backdrop-blur-md shadow-2xl"
+            >
                 <p className="text-gray-600 dark:text-gray-300">No chapters found</p>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     Chapters will appear here when available
@@ -50,7 +55,7 @@ const ChapterList = ({
                                 : "";
 
                     const rowStyle = showContinue
-                        ? "border-action/50 dark:border-action-dark/60 bg-action/10 dark:bg-action-dark/15"
+                        ? "border-(--action)/50 bg-(--action)/10"
                         : isCompleted
                             ? "border-emerald-400/40 dark:border-emerald-500/30 bg-emerald-100/40 dark:bg-emerald-900/20 opacity-80"
                             : "border-white/20 dark:border-white/10 bg-white/35 dark:bg-black/30";
@@ -58,11 +63,19 @@ const ChapterList = ({
                     <li
                         key={ch.id}
                         onClick={() => onChapterClick?.(ch.id)}
-                        className={`p-3 rounded-2xl hover:-translate-y-0.5 cursor-pointer transition-all backdrop-blur-md shadow-2xl border ${rowStyle}`}
+                        className={`
+                            p-3 rounded-2xl hover:-translate-y-0.5 cursor-pointer
+                            transition-all backdrop-blur-md shadow-2xl border ${rowStyle}
+                        `}
                     >
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
                             <div className="flex items-center gap-3 min-w-0">
-                                <span className="w-8 h-8 shrink-0 flex items-center justify-center rounded-full bg-black/5 dark:bg-white/10 text-black/70 dark:text-gray-200 font-semibold text-sm">
+                                <span 
+                                    className="
+                                    w-8 h-8 shrink-0 flex items-center justify-center rounded-full 
+                                    bg-black/5 dark:bg-white/10 text-black/70 
+                                    dark:text-gray-200 font-semibold text-sm"
+                                >
                                     {chapterBadge}
                                 </span>
                                 <div className="min-w-0">
@@ -75,17 +88,29 @@ const ChapterList = ({
 
                             <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-3">
                                 {showContinue && (
-                                    <span className="text-[10px] sm:text-xs font-semibold px-2 py-1 rounded-full bg-action/20 dark:bg-action-dark/60 text-black/80 dark:text-gray-100">
+                                    <span 
+                                        className="
+                                        text-[10px] sm:text-xs font-semibold px-2 py-1 
+                                        rounded-full bg-(--action)/50 text-black/80 dark:text-gray-100"
+                                    >
                                         Continue
                                     </span>
                                 )}
                                 {isCompleted && (
-                                    <span className="text-[10px] sm:text-xs font-semibold px-2 py-1 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300">
+                                    <span 
+                                        className="
+                                        text-[10px] sm:text-xs font-semibold px-2 py-1 
+                                        rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
+                                    >
                                         Read
                                     </span>
                                 )}
                                 {isInProgress && !isCurrent && (
-                                    <span className="text-[10px] sm:text-xs font-semibold px-2 py-1 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300">
+                                    <span 
+                                        className="
+                                        text-[10px] sm:text-xs font-semibold px-2 py-1 
+                                        rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300"
+                                    >
                                         In Progress
                                     </span>
                                 )}

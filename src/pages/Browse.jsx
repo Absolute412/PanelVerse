@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import Footer from "./Footer";
-import Navbar from "./Navbar";
-import Search from "./Search";
-import Card from "./Card";
+import Footer from "../components/Footer";
+import Navbar from "../components/Navbar";
+import Search from "../components/Search";
+import Card from "../components/Card";
 import { Link } from "react-router-dom";
 import { useDebounce } from "react-use";
 import { mangaApi } from "../api";
-import SkeletonCard from "./SkeletonCard";
-import ScrollToTopBtn from "./ScrollToTopBtn";
+import SkeletonCard from "../components/SkeletonCard";
+import ScrollToTopBtn from "../components/ScrollToTopBtn";
 
 function Browse() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -122,7 +122,7 @@ function Browse() {
   }, [loadMore, debouncedSearchTerm, initialLoading, initialError, loadMoreError]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-main dark:bg-main-dark">
+    <div className="min-h-screen flex flex-col bg-(--main)">
       <Navbar />
 
       <div className="flex-1 pt-20 pb-16 px-4 sm:px-6">
@@ -156,8 +156,9 @@ function Browse() {
             <button 
               disabled={initialLoading}
               onClick={() => setRetryKey(prev => prev + 1)} 
-              className="px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:opacity-50
-                                 disabled:cursor-not-allowed text-white rounded-md cursor-pointer"
+              className="
+              px-4 py-2 bg-(--component) hover:bg-(--component-hover) disabled:opacity-50
+              disabled:cursor-not-allowed text-white rounded-md cursor-pointer"
             >
               Retry
             </button>
@@ -167,7 +168,7 @@ function Browse() {
         <div className="mt-10 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
           {mangas.map(manga => (
             <Link key={manga.id} to={`/manga/${manga.id}`}>
-              <Card manga={manga} />
+              <Card key={manga.id} manga={manga} />
             </Link>
           ))}
 
@@ -193,9 +194,10 @@ function Browse() {
                 loadMore();
               }}
               disabled={loadingMore}
-              className="px-4 py-2 rounded-md text-sm font-medium
-                                  bg-blue-500 hover:bg-blue-600 text-white
-                                  disabled:opacity-50 disabled:cursor-not-allowed transition"
+              className="
+              px-4 py-2 rounded-md text-sm font-medium
+              bg-(--component) hover:bg-(--component-hover) text-white
+              disabled:opacity-50 disabled:cursor-not-allowed transition"
             >
               {loadingMore ? "Retrying..." : "Retry"}
             </button>

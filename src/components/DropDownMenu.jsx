@@ -32,7 +32,7 @@ function DropDownMenu () {
 
             {open && (
                 <div className={
-                    `absolute right-0 mt-4 mr-1 w-52 sm:w-56 md:w-60 bg-main/95 dark:bg-component-dark/95 rounded-2xl
+                    `absolute right-0 mt-4 mr-1 w-52 sm:w-56 md:w-60 bg-(--main)/95 rounded-2xl
                     p-3 sm:p-4 text-sm z-50 shadow-xl border border-black/5 dark:border-white/10 backdrop-blur-md
                     transform transition-all duration-200 ease-out origin-top-right
                     ${open ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 -translate-y-2 pointer-events-none"}`
@@ -52,7 +52,7 @@ function DropDownMenu () {
                         to="/profile" 
                         className="
                             flex items-center justify-start gap-3 w-full px-3 py-2 text-sm font-medium text-gray-700
-                            dark:text-gray-200 hover:bg-component dark:hover:bg-component-hover-dark rounded-lg transition-colors
+                            dark:text-gray-200 hover:bg-(--component) rounded-lg transition-colors
                         ">
                         <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-black/5 dark:bg-white/5">
                             <Icon icon="mdi:account-outline" className="text-lg"/>
@@ -63,7 +63,7 @@ function DropDownMenu () {
                         to="/settings" 
                         className="
                             flex items-center justify-start gap-3 w-full px-3 py-2 text-sm font-medium text-gray-700 
-                            dark:text-gray-200 hover:bg-component dark:hover:bg-component-hover-dark rounded-lg transition-colors
+                            dark:text-gray-200 hover:bg-(--component) rounded-lg transition-colors
                         ">
                         <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-black/5 dark:bg-white/5">
                             <Icon icon="line-md:cog-loop" className="text-lg"/>

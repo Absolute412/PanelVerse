@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { getAllChapters, getChapterPages } from "../api/manga";
-import Navbar from "./Navbar";
+import Navbar from "../components/Navbar";
 import { Icon } from "@iconify/react";
 import { getChapterLabel } from "../utils/formatChapter";
 import { getMangaProgress, setMangaProgress } from "../utils/storageService";
@@ -206,22 +206,26 @@ const ChapterReader = () => {
 
   if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-main dark:bg-main-dark">
-                <Icon icon="eos-icons:loading" className="text-6xl text-action dark:text-gray-600"/>
+            <div className="min-h-screen flex items-center justify-center bg-(--main)">
+                <Icon icon="eos-icons:loading" className="text-6xl text-(--action-alt-hover)"/>
             </div>
         );
     }
   
   if (error) {
     return (
-      <div className="min-h-screen flex flex-col gap-2 items-center justify-center text-center py-6 text-red-500
-                                 bg-main dark:bg-main-dark dark:text-red-600"
+      <div 
+        className="
+        min-h-screen flex flex-col gap-2 items-center justify-center
+         text-center py-6 text-red-500bg-main dark:bg-main-dark dark:text-red-600"
       >
         {error}
 
         <button 
           onClick={handleBack} 
-          className="text-white dark:text-white px-2 py-2 bg-component dark:bg-component-dark hover:bg-blue-500 dark:hover:bg-component-hover-dark rounded-lg cursor-pointer"
+          className="
+          text-white dark:text-white px-2 py-2 bg-(--component)
+          hover:bg-(--component-hover) rounded-lg cursor-pointer"
         >
           Go back
         </button>
@@ -234,12 +238,14 @@ const ChapterReader = () => {
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
-      <main className="flex-1 items-center pt-20 bg-main dark:bg-main-dark">
+      <main className="flex-1 items-center pt-20 bg-(--main)">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex items-center gap-3 w-full mb-4">
             <button 
               onClick={handleBack} 
-              className="p-2 rounded-full bg-black/5 dark:bg-white/10 text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-gray-400 transition cursor-pointer"
+              className="
+              p-2 rounded-full bg-black/5 dark:bg-white/10 text-gray-700
+              dark:text-gray-200 hover:text-gray-900 dark:hover:text-gray-400 transition cursor-pointer"
               aria-label="Go back"
             >
               <Icon icon="eva:arrow-back-fill"/>
@@ -252,7 +258,12 @@ const ChapterReader = () => {
         </div>
 
         <div className="flex flex-col items-center bg-main dark:bg-main-dark min-h-screen py-6 gap-4">
-          <h2 className="text-gray-800 dark:text-gray-200 font-semibold bg-white/35 dark:bg-black/30 border border-white/20 dark:border-white/10 rounded-full px-4 py-2 backdrop-blur-md shadow-2xl">
+          <h2 
+            className="
+            text-gray-800 dark:text-gray-200 font-semibold bg-white/35 
+            dark:bg-black/30 border border-white/20 dark:border-white/10 
+            rounded-full px-4 py-2 backdrop-blur-md shadow-2xl"
+          >
             {chapterLabel}
           </h2>
 
@@ -278,7 +289,11 @@ const ChapterReader = () => {
           {pages.length > 1 && (
           <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[min(92vw,900px)]">
             <div className="flex items-center justify-between gap-3">
-              <div className="bg-white/35 dark:bg-black/30 border border-white/20 dark:border-white/10 rounded-full px-4 py-2 backdrop-blur-md shadow-2xl">
+              <div 
+                className="
+                bg-white/35 dark:bg-black/30 border border-white/20 dark:border-white/10 
+                rounded-full px-4 py-2 backdrop-blur-md shadow-2xl"
+              >
                 <button
                   disabled={!prevChapter}
                   onClick={() =>
@@ -296,9 +311,17 @@ const ChapterReader = () => {
                 </button>
               </div>
 
-              <div className="bg-white/35 dark:bg-black/30 border border-white/20 dark:border-white/10 rounded-full px-2.5 py-2 backdrop-blur-md shadow-2xl w-[min(52vw,360px)] md:w-auto">
+              <div 
+                className="
+                bg-white/35 dark:bg-black/30 border border-white/20 dark:border-white/10
+                rounded-full px-2.5 py-2 backdrop-blur-md shadow-2xl w-[min(52vw,360px)] md:w-auto"
+              >
                 <div className="flex items-center gap-2 sm:gap-3">
-                  <span className="text-[10px] sm:text-xs font-semibold text-gray-600 dark:text-gray-300 tabular-nums min-w-5 text-left">
+                  <span 
+                    className="
+                    text-[10px] sm:text-xs font-semibold text-gray-600 
+                    dark:text-gray-300 tabular-nums min-w-5 text-left"
+                  >
                     {activeIdx + 1}
                   </span>
                   <div className="flex-1 min-w-0">
@@ -331,13 +354,21 @@ const ChapterReader = () => {
                       })}
                     </div>
                   </div>
-                  <span className="text-[10px] sm:text-xs font-semibold text-gray-600 dark:text-gray-300 tabular-nums min-w-5 text-right">
+                  <span 
+                    className="
+                    text-[10px] sm:text-xs font-semibold text-gray-600
+                    dark:text-gray-300 tabular-nums min-w-5 text-right"
+                  >
                     {pages.length}
                   </span>
                 </div>
               </div>
 
-              <div className="bg-white/35 dark:bg-black/30 border border-white/20 dark:border-white/10 rounded-full px-4 py-2 backdrop-blur-md shadow-2xl">
+              <div 
+                className="
+                bg-white/35 dark:bg-black/30 border border-white/20 
+                dark:border-white/10 rounded-full px-4 py-2 backdrop-blur-md shadow-2xl"
+              >
                 <button
                   disabled={!nextChapter}
                   onClick={() =>
@@ -356,9 +387,7 @@ const ChapterReader = () => {
               </div>
             </div>
           </div>
-          )}
-
-          
+          )}         
         </div>
       </main>
     </div>

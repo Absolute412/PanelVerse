@@ -1,9 +1,9 @@
-import { AddButton } from "./AddButton";
-import Navbar from "./Navbar";
-import Footer from "./Footer";
+import { AddButton } from "../components/AddButton";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Icon } from "@iconify/react";
-import ChapterList from "./ChapterList";
+import ChapterList from "../components/ChapterList";
 import { useEffect, useState } from "react";
 import { getAllChapters, getManga } from "../api/manga";
 import { getMangaProgress, setMangaProgress } from "../utils/storageService";
@@ -132,7 +132,7 @@ const MangaPage = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-main dark:bg-main-dark">
+            <div className="min-h-screen flex items-center justify-center bg-(--main)">
                 <Icon icon="eos-icons:loading" className="text-6xl text-action dark:text-gray-600"/>
             </div>
         );
@@ -140,7 +140,7 @@ const MangaPage = () => {
 
     if (!manga) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center dark:bg-main-dark">
+            <div className="min-h-screen flex flex-col items-center justify-center bg-(--main)">
                 <p className="text-gray-600 dark:text-white">Manga not found</p>
                 <button 
                     onClick={() => navigate(-1)} 
@@ -153,7 +153,7 @@ const MangaPage = () => {
     }
 
   return (
-    <div className="min-h-screen flex flex-col bg-main dark:bg-main-dark">
+    <div className="min-h-screen flex flex-col bg-(--main)">
         <Navbar />
         <div className="flex-1">
             <div className="pt-20 pb-16 px-4 sm:px-6">
@@ -165,43 +165,79 @@ const MangaPage = () => {
                         <span className="h-px flex-1 bg-black/20 dark:bg-white/20" />
                     </div>
 
-                    <div className="flex flex-row gap-3 sm:gap-4 bg-white/35 dark:bg-black/30 border border-white/20 dark:border-white/10 rounded-2xl backdrop-blur-md shadow-2xl p-4 sm:p-6 ">
+                    <div 
+                        className="
+                        flex flex-row gap-3 sm:gap-4 bg-white/35 dark:bg-black/30 border 
+                        border-white/20 dark:border-white/10 rounded-2xl 
+                        backdrop-blur-md shadow-2xl p-4 sm:p-6 "
+                    >
                         <div
-                            className="relative group cursor-pointer overflow-hidden rounded-lg w-32 h-56 sm:w-42 sm:h-auto shrink-0 self-start sm:self-auto sm:mx-0"
+                            className="
+                            relative group cursor-pointer overflow-hidden rounded-lg 
+                            w-32 h-56 sm:w-42 sm:h-auto shrink-0 self-start sm:self-auto sm:mx-0"
                             onClick={() => setOpen(true)}
                         >
                             <img 
                                 src={manga.imageThumb}
                                 alt={manga.title} 
-                                className="w-full h-full sm:h-60 object-cover rounded transition-transform duration-300 group-hover:scale-105"
+                                className="
+                                w-full h-full sm:h-60 object-cover rounded 
+                                transition-transform duration-300 group-hover:scale-105"
                             />
 
-                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/60 transition-colors duration-300 flex items-center justify-center">
+                            <div 
+                                className="
+                                absolute inset-0 bg-black/0 group-hover:bg-black/60 
+                                transition-colors duration-300 flex items-center justify-center"
+                            >
                                 <Icon 
                                     icon="humbleicons:expand"
-                                    className="text-white text-4xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                    className="
+                                    text-white text-4xl opacity-0 
+                                    group-hover:opacity-100 transition-opacity duration-300"
                                 />
                             </div>
                         </div>
 
                         <div className="flex flex-col h-56 sm:h-60 min-w-0 flex-1">                        
-                            <h2 className="text-base sm:text-3xl font-extrabold tracking-tight mb-2 text-gray-800 dark:text-white">
+                            <h2 
+                                className="
+                                text-base sm:text-3xl font-extrabold tracking-tight 
+                                mb-2 text-gray-800 dark:text-white"
+                            >
                                 {manga.title}
                             </h2>
 
-                            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[10px] sm:text-[12px] font-semibold text-black/70 dark:text-white/70 mb-3">
-                                <span className="px-2 py-0.5 sm:px-3 sm:py-1 rounded-full bg-black/5 dark:bg-white/10 flex items-center gap-1 whitespace-nowrap">
+                            <div 
+                                className="
+                                flex flex-wrap items-center gap-2 sm:gap-3 text-[10px] 
+                                sm:text-[12px] font-semibold text-black/70 dark:text-white/70 mb-3"
+                            >
+                                <span 
+                                    className="
+                                    px-2 py-0.5 sm:px-3 sm:py-1 rounded-full bg-black/5 
+                                    dark:bg-white/10 flex items-center gap-1 whitespace-nowrap"
+                                >
                                     <Icon icon="mdi:account-outline" className="text-sm"/>
                                     {manga.author || "unknown"}
                                 </span>
                                 {manga.status && (
-                                    <span className="px-2 py-0.5 sm:px-3 sm:py-1 rounded-full bg-black/5 dark:bg-white/10 whitespace-nowrap">
+                                    <span 
+                                        className="
+                                        px-2 py-0.5 sm:px-3 sm:py-1 rounded-full 
+                                        bg-black/5 dark:bg-white/10 whitespace-nowrap"
+                                    >
                                         {manga.status}
                                     </span>
                                 )}
                             </div>
 
-                            <p className="mt-1 flex-1 overflow-y-auto overflow-x-hidden wrap-break-word pr-2 text-sm sm:text-base text-gray-800/90 dark:text-gray-100/90 custom-scrollbar min-h-0 max-h-24 sm:max-h-40 md:max-h-none">
+                            <p 
+                                className="
+                                mt-1 flex-1 overflow-y-auto overflow-x-hidden wrap-break-word 
+                                pr-2 text-sm sm:text-base text-gray-800/90 dark:text-gray-100/90 
+                                custom-scrollbar min-h-0 max-h-24 sm:max-h-40 md:max-h-none"
+                            >
                                 {manga.description || "No description available."}
                             </p>
 
@@ -210,10 +246,12 @@ const MangaPage = () => {
                                 <Link 
                                     to={resumeChapterId ? `/read/${mangaId}/${resumeChapterId}` : "#"}
                                     state={readingState}
-                                    className={`flex-1 sm:flex-none text-center px-2 py-1 sm:px-4 sm:py-2 text-sm font-medium rounded-md transition
+                                    className={`f
+                                        lex-1 sm:flex-none text-center px-2 py-1 sm:px-4 
+                                        sm:py-2 text-sm font-medium rounded-md transition
                                         ${chapters.length === 0
                                             ? "bg-gray-400 dark:bg-gray-600 text-white cursor-not-allowed pointer-events-none"
-                                            : "bg-action hover:bg-action-hover dark:bg-action-dark dark:hover:bg-action-dark-hover text-white cursor-pointer"
+                                            : "bg-(--action) hover:bg-(--action-hover) text-white cursor-pointer"
                                         }
                                     `}
                                 >
@@ -221,7 +259,10 @@ const MangaPage = () => {
                                 </Link>
 
                                 <div className="flex-1 sm:flex-none min-w-0">
-                                    <AddButton manga={manga} className="w-full sm:w-auto justify-center text-sm"/>
+                                    <AddButton 
+                                        manga={manga} 
+                                        className="w-full sm:w-auto justify-center text-sm"
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -234,7 +275,10 @@ const MangaPage = () => {
                                 manga.genres.map((genre, index) => (
                                     <span 
                                         key={index} 
-                                        className="bg-black/10 dark:bg-white/10 text-black dark:text-gray-200 text-[10px] font-black px-3 py-1 rounded-full">
+                                        className="
+                                        bg-black/10 dark:bg-white/10 text-black 
+                                        dark:text-gray-200 text-[10px] font-black px-3 py-1 rounded-full"
+                                    >
                                         {genre}
                                     </span>
                                 ))

@@ -29,7 +29,7 @@ const ToggleTheme = () => {
                     onChange={ toggleTheme }
                     aria-label="Toggle dark mode"
                 />
-                <div className="w-12 h-6 rounded-full bg-gray-300 dark:bg-gray-600 peer-checked:bg-primary-dark transition-colors duration-300"></div>
+                <div className="w-12 h-6 rounded-full bg-gray-300 dark:bg-gray-600 peer-checked:bg-(--primary) transition-colors duration-300"></div>
                 <div className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform duration-300 peer-checked:translate-x-6"></div>
             </label>
         </div>

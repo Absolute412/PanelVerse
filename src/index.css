@@ -1,59 +1,66 @@
 @import "tailwindcss";
-
 @custom-variant dark (&:where(.dark, .dark *));
-
-/* Midnight Blue */
-@theme {
-  --color-primary: #93C5FD;
-  --color-main: #bbd9ff;
-
-  --color-component: #D6E6FF;
-  --color-component-light-hover: #C4DBFF;
-
-  --color-action: #3B82F6;
-  --color-action-hover: #2563EB;
-  --color-action-light-alt: #60A5FA;
-  --color-action-light-alt-hover: #3B82F6;
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
 
 
-  --color-hero-action: #0EA5E9;
-  --color-hero-action-hover: #0284C7;
+:root {
+  --primary: #93C5FD;
+  --main: #bbd9ff;
 
-  --color-primary-dark: #0A0F1E;
-  --color-main-dark: #0F1629;
-  --color-component-dark: #151D36;
-  --color-component-hover-dark: #1B2550;
-  --color-action-dark: #1B2550;
-  --color-action-dark-hover: #26336B;
-  --color-nav-dark: #1F2A5A;
+  --component: #D6E6FF;
+  --component-hover: #C4DBFF;
+
+  --action: #3B82F6;
+  --action-hover: #2563EB;
+  --action-alt: #60A5FA;
+  --action-alt-hover: #3B82F6;
+
+  --hero-action: #0EA5E9;
+}
+
+.dark {
+  --primary: #0A0F1E;
+  --main: #0F1629;
+
+  --component: #151D36;
+  --component-hover: #1B2550;
+    
+  --action: #1B2550;
+  --action-hover: #26336B;
+  --action-alt: #60A5FA;
+  --action-alt-hover: #3B82F6;
+
+  --hero-action: #1B2550;
+
+  --nav-dark: #1F2A5A;
 }
 
 /* Midnight Purple */
-@theme-purle {
-  --color-primary: #C7BFFF;
-  --color-main: #E1D9FF;
+.theme-purple {
+  --primary: #C7BFFF;
+  --main: #E1D9FF;
 
-  --color-component: #ECE8FF;
-  --color-component-light-hover: #DED6FF;
+  --component: #ECE8FF;
+  --component-light-hover: #DED6FF;
 
-  --color-action: #8B5CF6;
-  --color-action-hover: #7C3AED;
-  --color-action-light-alt: #A78BFA;
-  --color-action-light-alt-hover: #8B5CF6;
+  --action: #8B5CF6;
+  --action-hover: #7C3AED;
+  --action-light-alt: #A78BFA;
+  --action-light-alt-hover: #8B5CF6;
 
-  --color-hero-action: #A855F7;
-  --color-hero-action-hover: #9333EA;
+  --hero-action: #A855F7;
+  --hero-action-hover: #9333EA;
 
-  --color-primary-dark: #0D0B1A;
-  --color-main-dark: #141028;
-  --color-component-dark: #1B153A;
-  --color-component-hover-dark: #2A1F5E;
-  --color-action-dark: #2A1F5E;
-  --color-action-dark-hover: #3A2C7A;
+  --primary-dark: #0D0B1A;
+  --main-dark: #141028;
+  --component-dark: #1B153A;
+  --component-hover-dark: #2A1F5E;
+  --action-dark: #2A1F5E;
+  --action-dark-hover: #3A2C7A;
 }
 
 body {
-  font-family: sans-serif;
+  font-family: "Plus Jarkata Sans", sans-serif;
 }
 
 html.dark {

@@ -1,18 +1,14 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 const Card = ({manga, onClick}) => {
     const [imageIndex, setImageIndex] = useState(0);
-    
-    if(!manga) return null
-    const imageCandidates = useMemo(
-        () => [manga.imageMedium, manga.imageThumb, manga.imageFull, "/placeholder.jpg"].filter(Boolean),
+
+    const imageCandidates = useMemo(() => 
+        [manga.imageMedium, manga.imageThumb, manga.imageFull, "/placeholder.jpg"].filter(Boolean),
         [manga.imageMedium, manga.imageThumb, manga.imageFull]
     );
 
-    useEffect(() => {
-        // Reset image fallback chain when card data changes.
-        setImageIndex(0);
-    }, [imageCandidates]);
+    if(!manga) return null;
 
     const handleImageError = () => {
         setImageIndex((prev) => (prev < imageCandidates.length - 1 ? prev + 1 : prev));

@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import Navbar from "./Navbar";
-import Footer from "./Footer";
+import Footer from "../components/Footer";
+import Navbar from "../components/Navbar";
 import { Link } from "react-router-dom";
-import Card from "./Card";
-import ScrollToTopBtn from "./ScrollToTopBtn";
+import Card from "../components/Card";
+import ScrollToTopBtn from "../components/ScrollToTopBtn";
 import { mangaApi } from "../api";
-import SkeletonCard from "./SkeletonCard";
+import SkeletonCard from "../components/SkeletonCard";
 
-function PopularPage() {
+function RecentlyAddedPage() {
     const [mangas, setMangas] = useState([]);
     const [initialLoading, setInitialLoading] = useState(false);
     const [loadingMore, setLoadingMore] = useState(false);
@@ -29,7 +29,7 @@ function PopularPage() {
     setLoadMoreError(false);
 
     try {
-        const more = await mangaApi.getPopularManga(LIMIT, offset);
+        const more = await mangaApi.getRecentlyAddedManga(LIMIT, offset);
 
         if (more.length === 0) {
         setHasMore(false);
@@ -55,7 +55,7 @@ function PopularPage() {
         setInitialError(null);
         setLoadMoreError(false);
   
-        const data = await mangaApi.getPopularManga(LIMIT);
+        const data = await mangaApi.getRecentlyAddedManga(LIMIT);
         if (active) {
             setMangas(data);
             setOffset(LIMIT);
@@ -101,7 +101,7 @@ function PopularPage() {
     }, [loadMore, initialLoading, initialError, loadMoreError]);
 
     return(
-        <div className="min-h-screen flex flex-col bg-main dark:bg-main-dark">
+        <div className="min-h-screen flex flex-col bg-(--main)">
             <Navbar />
 
             <div className="flex-1 pt-20 pb-6 px-4 sm:px-6">
@@ -110,7 +110,7 @@ function PopularPage() {
                 <div className="flex items-center justify-between my-2">
                     <div className="flex items-center gap-3 w-full">
                         <span className="text-[15px] font-black tracking-[0.2em] uppercase text-black/70 dark:text-white/70">
-                            Popular Manga
+                            Recently Added Manga
                         </span>
                         <span className="h-px flex-1 bg-black/20 dark:bg-white/20" />
                     </div>
@@ -132,16 +132,18 @@ function PopularPage() {
                         disabled={initialLoading}
                         onClick={() => setRetryKey(prev => prev + 1)} 
                         className="
-                            px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:opacity-50
-                            disabled:cursor-not-allowed text-white rounded-md cursor-pointer"
-                    >Retry</button>
+                        px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:opacity-50
+                        disabled:cursor-not-allowed text-white rounded-md cursor-pointer"
+                    >
+                        Retry
+                    </button>
                 </div>
                 )}
 
                 <div className="mt-10 grid grid-cols-2  sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
                     {mangas.map(manga => (
                         <Link key={manga.id} to={`/manga/${manga.id}`}>
-                            <Card manga={manga} />
+                            <Card key={manga.id} manga={manga} />
                         </Link>
                     ))}
 
@@ -167,9 +169,10 @@ function PopularPage() {
                             loadMore();
                         }}
                         disabled={loadingMore}
-                        className="px-4 py-2 rounded-md text-sm font-medium
-                                            bg-blue-500 hover:bg-blue-600 text-white
-                                            disabled:opacity-50 disabled:cursor-not-allowed transition"
+                        className="
+                            px-4 py-2 rounded-md text-sm font-medium
+                            bg-blue-500 hover:bg-blue-600 text-white
+                            disabled:opacity-50 disabled:cursor-not-allowed transition"
                         >
                         {loadingMore ? "Retrying..." : "Retry"}
                     </button>
@@ -193,4 +196,4 @@ function PopularPage() {
     );
 }
 
-export default PopularPage
+export default RecentlyAddedPage

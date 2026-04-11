@@ -1,14 +1,14 @@
 import { useLibrary } from "../contexts/LibraryContext";
-import Card from "./Card";
-import Footer from "./Footer";
-import Navbar from "./Navbar";
+import Card from "../components/Card";
+import Footer from "../components/Footer";
+import Navbar from "../components/Navbar";
 import { Link } from "react-router-dom";
 
 function Library() {
     const {library} = useLibrary();
 
     return(
-        <div className="min-h-screen flex flex-col bg-main dark:bg-main-dark">
+        <div className="min-h-screen flex flex-col bg-(--main)">
             <Navbar />
 
             <div className="flex-1">
@@ -35,7 +35,7 @@ function Library() {
                         <div className="mt-10 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
                             {library.map((manga) => (
                                 <Link to={`/manga/${manga.id}`}>
-                                    <Card manga={manga} />
+                                    <Card key={manga.id} manga={manga} />
                                 </Link>
                             ))}
                         </div>

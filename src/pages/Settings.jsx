@@ -1,6 +1,6 @@
 import { Icon } from "@iconify/react";
-import Footer from "./Footer";
-import Navbar from "./Navbar";
+import Footer from "../components/Footer";
+import Navbar from "../components/Navbar";
 import { Link, useNavigate } from "react-router-dom";
 import { useRef, useState } from "react";
 import { exportStorageData, importStorageData } from "../utils/storageService";
@@ -61,7 +61,7 @@ function Settings() {
     };
     
     return (
-        <div className="min-h-screen flex flex-col bg-main dark:bg-main-dark">
+        <div className="min-h-screen flex flex-col bg-(--main)">
             <Navbar />
 
             <main className="flex-1 items-center pt-20">
@@ -70,9 +70,8 @@ function Settings() {
                         <button 
                             onClick={handleBack} 
                             className="
-                                p-2 rounded-full bg-black/5 dark:bg-white/10 text-gray-700 dark:text-gray-200 
-                                hover:bg-gray-200/60 dark:hover:bg-gray-500/40 transition cursor-pointer
-                            "
+                            p-2 rounded-full bg-black/5 dark:bg-white/10 text-gray-700 dark:text-gray-200 
+                            hover:bg-gray-200/60 dark:hover:bg-gray-500/40 transition cursor-pointer"
                             aria-label="Go back"
                         >
                             <Icon icon="eva:arrow-back-fill"/>
@@ -91,9 +90,9 @@ function Settings() {
                         <div className="py-4">
                             <button 
                                 className="
-                                    w-full flex items-center justify-between bg-white/35 dark:bg-black/30 
-                                    border border-white/20 dark:border-white/10 rounded-2xl shadow-2xl 
-                                    hover:-translate-y-0.5 transition-transform backdrop-blur-md p-4 cursor-pointer"
+                                w-full flex items-center justify-between bg-white/35 dark:bg-black/30 
+                                border border-white/20 dark:border-white/10 rounded-2xl shadow-2xl 
+                                hover:-translate-y-0.5 transition-transform backdrop-blur-md p-4 cursor-pointer"
                             >
                                 <div className="flex items-center gap-4">
                                     <div 
@@ -108,7 +107,10 @@ function Settings() {
                                         <p className="text-sm text-black/60 dark:text-white/60">Sign in to sync reading progress</p>
                                     </div>
                                 </div>
-                                <Icon icon="ic:round-navigate-next" className="text-xl text-gray-400" />
+                                <Icon 
+                                    icon="ic:round-navigate-next" 
+                                    className="text-xl text-gray-400" 
+                                />
                             </button>
                         </div>
                     </Link>
@@ -117,12 +119,15 @@ function Settings() {
                         <Link 
                             to="/profile" 
                             className="
-                                w-full flex items-center justify-between bg-white/35 dark:bg-black/30 
-                                border border-white/20 dark:border-white/10 rounded-2xl shadow-2xl 
-                                hover:-translate-y-0.5 transition-transform backdrop-blur-md p-4 cursor-pointer"
+                            w-full flex items-center justify-between bg-white/35 dark:bg-black/30 
+                            border border-white/20 dark:border-white/10 rounded-2xl shadow-2xl 
+                            hover:-translate-y-0.5 transition-transform backdrop-blur-md p-4 cursor-pointer"
                         >
                             <p className="text-base font-semibold text-gray-800 dark:text-white">Edit profile</p>
-                            <Icon icon="ic:round-navigate-next" className="text-xl text-gray-400" />
+                            <Icon 
+                                icon="ic:round-navigate-next" 
+                                className="text-xl text-gray-400" 
+                            />
                         </Link>
 
                         {/* <ToggleButton /> */}
@@ -135,7 +140,10 @@ function Settings() {
                                 hover:-translate-y-0.5 transition-transform backdrop-blur-md p-4 cursor-pointer"
                         >
                             <p className="text-base font-semibold text-gray-800 dark:text-white">Library</p>
-                            <Icon icon="ic:round-navigate-next" className="text-xl text-gray-400" />
+                            <Icon 
+                                icon="ic:round-navigate-next" 
+                                className="text-xl text-gray-400" 
+                            />
                         </Link>
 
                         <Link 
@@ -165,9 +173,8 @@ function Settings() {
                                     type="button"
                                     onClick={handleExportBackup}
                                     className="
-                                        w-full sm:w-auto px-4 py-2 rounded-lg font-semibold text-white bg-action
-                                        hover:bg-action-hover dark:bg-action-dark dark:hover:bg-action-dark-hover cursor-pointer
-                                    "
+                                    w-full sm:w-auto px-4 py-2 rounded-lg font-semibold 
+                                    text-white bg-(--action) hover:bg-(--action-hover) cursor-pointer"
                                 >
                                     Export Backup
                                 </button>
@@ -176,9 +183,8 @@ function Settings() {
                                     type="button"
                                     onClick={handleImportClick}
                                     className="
-                                        w-full sm:w-auto px-4 py-2 rounded-lg font-semibold text-gray-900 dark:text-white
-                                        bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 cursor-pointer
-                                    "
+                                    w-full sm:w-auto px-4 py-2 rounded-lg font-semibold text-gray-900 dark:text-white
+                                    bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 cursor-pointer"
                                 >
                                     Import Backup
                                 </button>
