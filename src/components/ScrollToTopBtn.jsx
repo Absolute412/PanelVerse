@@ -37,13 +37,15 @@ const ScrollToTopBtn = () => {
         {showTopBtn && (
             <button
                 onClick={scrollToTop}
-                className={`fixed bottom-24 sm:bottom-20 right-4 z-40 transition-opacity duration-300
+                className={`
+                    fixed bottom-24 sm:bottom-20 right-4 z-40 transition-opacity duration-300
                     ${visible ? "opacity-100" : "opacity-0 pointer-events-none"}
-                    `}
+                `}
             >
-                <div className="
-                    flex items-center gap-1 p-2 rounded-full bg-white/70 dark:bg-component-dark 
-                    backdrop-blur-2xl shadow-md hover:bg-white dark:hover:bg-component-hover-dark transition"
+                <div 
+                    className="
+                    flex items-center gap-1 p-2 rounded-full bg-white/70 hover:bg-white 
+                    dark:bg-(--component) dark:hover:bg-(--component-hover) backdrop-blur-2xl shadow-md transition"
                 >
                     <Icon 
                         icon="mingcute:up-fill" 
