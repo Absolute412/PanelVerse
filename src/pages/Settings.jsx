@@ -4,7 +4,7 @@ import Navbar from "../components/Navbar";
 import { Link, useNavigate } from "react-router-dom";
 import { useRef, useState } from "react";
 import { exportStorageData, importStorageData } from "../utils/storageService";
-import { dPanelVerseLogo } from "../components/PanelVerseLogo";
+import { PanelVerseLogo } from "../components/PanelVerseLogo";
 
 function Settings() {
     const navigate = useNavigate();
