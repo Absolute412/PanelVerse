@@ -2,7 +2,7 @@ import { Icon } from "@iconify/react";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import ToggleTheme from "./ToggleTheme";
-import { Logo } from "./Logo";
+import { PanelVerseLogo } from "./PanelVerseLogo";
 // "material-symbols:close-rounded"
 
 function DropDownMenu () {
@@ -48,10 +48,10 @@ function DropDownMenu () {
                     ${open ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 -translate-y-2 pointer-events-none"}`
                 }>
                     <div className="flex items-center gap-3 rounded-xl bg-black/5 dark:bg-white/5 px-3 py-2 mb-3">
-                        <Logo size={32} />
+                        <PanelVerseLogo size={32} />
                         <div className="leading-tight">
                             <h4 className="font-extrabold text-base text-gray-800 dark:text-white">PanelVerse</h4>
-                            <p className="text-xs text-gray-500 dark:text-gray-300">Manga Reader</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">Explore the PanelVerse</p>
                         </div>
                     </div>
 

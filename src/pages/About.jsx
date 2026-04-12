@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import { Icon } from "@iconify/react";
-import { Logo } from "../components/Logo";
+import { PanelVerseLogo } from "../components/PanelVerseLogo";
 
 function About() {
     const navigate = useNavigate();
@@ -34,8 +34,8 @@ function About() {
                     </div>
 
                     <div className="mt-6 bg-white/35 dark:bg-black/30 border border-white/20 dark:border-white/10 rounded-2xl backdrop-blur-md shadow-2xl p-6 sm:p-8">
-                        <div className="flex items-center gap-1">
-                            <Logo size={48} />
+                        <div className="flex items-center gap-3">
+                            <PanelVerseLogo size={48} />
                             <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
                                 PanelVerse
                             </h1>

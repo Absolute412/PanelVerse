@@ -4,7 +4,7 @@ import DropDownMenu from "./DropDownMenu";
 import { Icon } from "@iconify/react";
 import { useState } from "react";
 import ToggleTheme from "./ToggleTheme";
-import { Logo } from "./Logo";
+import { PanelVerseLogo } from "./PanelVerseLogo";
 
 const navItems = [
     {
@@ -67,7 +67,7 @@ function Navbar() {
                     text-slate-900 dark:text-white hover:text-slate-700 dark:hover:text-gray-300"
                 >
                     <div className="flex items-center gap-2">
-                        <Logo />
+                        <PanelVerseLogo size={32} />
                         <h2>PanelVerse</h2>
                     </div>
                 </Link>

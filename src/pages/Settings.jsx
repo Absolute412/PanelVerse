@@ -4,7 +4,7 @@ import Navbar from "../components/Navbar";
 import { Link, useNavigate } from "react-router-dom";
 import { useRef, useState } from "react";
 import { exportStorageData, importStorageData } from "../utils/storageService";
-import { Logo } from "../components/Logo";
+import { dPanelVerseLogo } from "../components/PanelVerseLogo";
 
 function Settings() {
     const navigate = useNavigate();
@@ -96,7 +96,7 @@ function Settings() {
                                 hover:-translate-y-0.5 transition-transform backdrop-blur-md p-4"
                             >
                                 <div className="flex items-center gap-2">
-                                    <Logo size={36} />
+                                    <PanelVerseLogo size={36} />
                                     <div className="text-left">
                                         <p className="font-extrabold text-lg text-gray-800 dark:text-white tracking-tight">PanelVerse</p>
                                         <p className="text-sm text-black/60 dark:text-white/60">Your local manga reader experience</p>
