@@ -207,7 +207,7 @@ const ChapterReader = () => {
   if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-(--main)">
-                <Icon icon="eos-icons:loading" className="text-6xl text-(--action-alt-hover)"/>
+                <Icon icon="eos-icons:loading" className="text-6xl text-(--action-hover)"/>
             </div>
         );
     }

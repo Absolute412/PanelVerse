@@ -1,9 +1,27 @@
 import { Icon } from "@iconify/react";
 import { useTheme } from "../contexts/ThemeContext";
 
-const ToggleTheme = () => {
+const ToggleTheme = ({ compact = false }) => {
     const {isDark, setIsDark} = useTheme();
     const toggleTheme = () => setIsDark(!isDark);
+
+    if (compact) {
+        return (
+            <button
+                onClick={toggleTheme}
+                className="
+                    flex items-center justify-center w-10 h-10 rounded-lg
+                    bg-(--component) border border-white/20 dark:border-white/10
+                    transition-all duration-200 hover:scale-105 active:scale-95"
+                aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+            >
+                <Icon
+                    icon={isDark ? "ph:moon-stars-fill" : "ph:sun-fill"}
+                    className="text-xl text-(--accent)"
+                />
+            </button>
+        );
+    }
 
     return (
         <div className="flex items-center justify-between w-full px-3 py-2 rounded-xl bg-black/5 dark:bg-white/5">

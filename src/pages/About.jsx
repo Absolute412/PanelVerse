@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import { Icon } from "@iconify/react";
+import { Logo } from "../components/Logo";
 
 function About() {
     const navigate = useNavigate();
@@ -19,7 +20,9 @@ function About() {
                     <div className="flex items-center gap-3 w-full my-2">
                         <button 
                             onClick={handleBack} 
-                            className="p-2 rounded-full bg-black/5 dark:bg-white/10 text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-gray-400 transition cursor-pointer"
+                            className="
+                            p-2 rounded-full bg-black/5 dark:bg-white/10 text-gray-700 dark:text-gray-200 
+                            hover:bg-gray-200/60 dark:hover:bg-gray-500/40 transition cursor-pointer"
                             aria-label="Go back"
                         >
                             <Icon icon="eva:arrow-back-fill"/>
@@ -31,8 +34,8 @@ function About() {
                     </div>
 
                     <div className="mt-6 bg-white/35 dark:bg-black/30 border border-white/20 dark:border-white/10 rounded-2xl backdrop-blur-md shadow-2xl p-6 sm:p-8">
-                        <div className="flex items-center gap-2">
-                            <span className="text-[48px]">📦</span>
+                        <div className="flex items-center gap-1">
+                            <Logo size={48} />
                             <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
                                 PanelVerse
                             </h1>
@@ -48,7 +51,7 @@ function About() {
                     </div>
 
                     <div className="mt-6 bg-white/35 dark:bg-black/30 border border-white/20 dark:border-white/10 rounded-2xl backdrop-blur-md shadow-2xl p-6 sm:p-8">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-3">
                             <img 
                                 src="\mangadex-v2-svgrepo-com.svg" 
                                 alt="mangadex logo" 

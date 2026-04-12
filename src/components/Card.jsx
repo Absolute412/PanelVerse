@@ -4,8 +4,8 @@ const Card = ({manga, onClick}) => {
     const [imageIndex, setImageIndex] = useState(0);
 
     const imageCandidates = useMemo(() => 
-        [manga.imageMedium, manga.imageThumb, manga.imageFull, "/placeholder.jpg"].filter(Boolean),
-        [manga.imageMedium, manga.imageThumb, manga.imageFull]
+        [manga.imageFull, manga.imageThumb, manga.imageMedium, "/placeholder.jpg"].filter(Boolean),
+        [manga.imageFull, manga.imageThumb, manga.imageMedium]
     );
 
     if(!manga) return null;
@@ -27,7 +27,7 @@ const Card = ({manga, onClick}) => {
             <img 
                 src={imageCandidates[imageIndex]}
                 onError={handleImageError}
-                className="w-full h-42 sm:h-64 object-cover"
+                className="w-full h-54 sm:h-80 object-cover"
                 loading="lazy"
                 alt={manga.title || "Manga cover"}
             />

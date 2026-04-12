@@ -31,8 +31,6 @@
   --action-alt-hover: #3B82F6;
 
   --hero-action: #1B2550;
-
-  --nav-dark: #1F2A5A;
 }
 
 /* Midnight Purple */
@@ -41,22 +39,30 @@
   --main: #E1D9FF;
 
   --component: #ECE8FF;
-  --component-light-hover: #DED6FF;
+  --component-hover: #DED6FF;
 
   --action: #8B5CF6;
   --action-hover: #7C3AED;
-  --action-light-alt: #A78BFA;
-  --action-light-alt-hover: #8B5CF6;
+  --action-alt: #A78BFA;
+  --action-alt-hover: #8B5CF6;
 
   --hero-action: #A855F7;
   --hero-action-hover: #9333EA;
+}
 
-  --primary-dark: #0D0B1A;
-  --main-dark: #141028;
-  --component-dark: #1B153A;
-  --component-hover-dark: #2A1F5E;
-  --action-dark: #2A1F5E;
-  --action-dark-hover: #3A2C7A;
+.theme-purple.dark {
+  --primary: #0D0B1A;
+  --main: #141028;
+
+  --component: #1B153A;
+  --component-hover: #2A1F5E;
+
+  --action: #2A1F5E;
+  --action-hover: #3A2C7A;
+  --action-alt: #A78BFA;
+  --action-alt-hover: #8B5CF6;
+
+  --hero-action: #2A1F5E;
 }
 
 body {

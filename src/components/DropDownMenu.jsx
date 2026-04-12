@@ -2,6 +2,7 @@ import { Icon } from "@iconify/react";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import ToggleTheme from "./ToggleTheme";
+import { Logo } from "./Logo";
 // "material-symbols:close-rounded"
 
 function DropDownMenu () {
@@ -23,41 +24,48 @@ function DropDownMenu () {
         <div className="relative" ref={dropdownRef}>
             <button 
                 onClick={() => setOpen(!open)} 
-                className="flex items-center justify-center cursor-pointer transition-transform duration-200 hover:scale-105"
+                className="
+                flex items-center justify-center cursor-pointer p-1 rounded-lg 
+                bg-(--component) transition-transform duration-200 "
                 aria-expanded={open}
                 aria-label="Open user menu"
             >
-                <Icon icon="iconamoon:profile" className="text-2xl dark:text-white" />
+                <Icon 
+                    icon="mdi:dots-vertical"
+                    className={`
+                        text-2xl dark:text-white transition-transform duration-200 ${
+                            open ? "rotate-90" : "rotate-0"
+                        }`}
+                />
             </button>
 
             {open && (
-                <div className={
-                    `absolute right-0 mt-4 mr-1 w-52 sm:w-56 md:w-60 bg-(--main)/95 rounded-2xl
+                <div 
+                    className={`
+                    absolute right-0 mt-4 mr-1 w-52 sm:w-56 md:w-60 bg-(--main)/95 rounded-2xl
                     p-3 sm:p-4 text-sm z-50 shadow-xl border border-black/5 dark:border-white/10 backdrop-blur-md
                     transform transition-all duration-200 ease-out origin-top-right
                     ${open ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 -translate-y-2 pointer-events-none"}`
                 }>
                     <div className="flex items-center gap-3 rounded-xl bg-black/5 dark:bg-white/5 px-3 py-2 mb-3">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/70 dark:bg-white/10">
-                            <Icon icon="mdi:account-outline" className="text-xl text-gray-700 dark:text-gray-200" />
-                        </div>
+                        <Logo size={32} />
                         <div className="leading-tight">
-                            <h4 className="font-semibold text-base text-gray-800 dark:text-white">Guest</h4>
+                            <h4 className="font-extrabold text-base text-gray-800 dark:text-white">PanelVerse</h4>
                             <p className="text-xs text-gray-500 dark:text-gray-300">Manga Reader</p>
                         </div>
                     </div>
 
                     <div className="flex flex-col gap-2">
                     <Link 
-                        to="/profile" 
+                        to="/about" 
                         className="
                             flex items-center justify-start gap-3 w-full px-3 py-2 text-sm font-medium text-gray-700
                             dark:text-gray-200 hover:bg-(--component) rounded-lg transition-colors
                         ">
                         <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-black/5 dark:bg-white/5">
-                            <Icon icon="mdi:account-outline" className="text-lg"/>
+                            <Icon icon="mdi:about-circle-outline" className="text-lg"/>
                         </span> 
-                        Profile
+                        About
                     </Link>
                     <Link 
                         to="/settings" 
@@ -72,13 +80,6 @@ function DropDownMenu () {
                     </Link>
                     <div className="h-px bg-black/10 dark:bg-white/10 my-1"/>
                     <ToggleTheme />
-                    {/* <div className="h-px bg-black/10 dark:bg-white/10 my-1"/>
-                    <Link to="/profile" className="flex items-center justify-start gap-3 w-full px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-main dark:hover:bg-component-hover-dark rounded-lg transition-colors">
-                        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-black/5 dark:bg-white/5">
-                            <Icon icon="stash:signin" className="text-lg"/>
-                        </span> 
-                        Sign In
-                    </Link> */}
                     </div>
                 </div>
             )}

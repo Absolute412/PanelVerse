@@ -4,6 +4,7 @@ import Navbar from "../components/Navbar";
 import { Link, useNavigate } from "react-router-dom";
 import { useRef, useState } from "react";
 import { exportStorageData, importStorageData } from "../utils/storageService";
+import { Logo } from "../components/Logo";
 
 function Settings() {
     const navigate = useNavigate();
@@ -86,58 +87,32 @@ function Settings() {
                         Manage your preferences
                     </p>
 
-                    <Link to="">
+                    <div>
                         <div className="py-4">
-                            <button 
+                            <div 
                                 className="
                                 w-full flex items-center justify-between bg-white/35 dark:bg-black/30 
                                 border border-white/20 dark:border-white/10 rounded-2xl shadow-2xl 
-                                hover:-translate-y-0.5 transition-transform backdrop-blur-md p-4 cursor-pointer"
+                                hover:-translate-y-0.5 transition-transform backdrop-blur-md p-4"
                             >
-                                <div className="flex items-center gap-4">
-                                    <div 
-                                        className="
-                                            p-2 rounded-full text-gray-800 
-                                            dark:text-gray-200 bg-black/5 dark:bg-white/10"
-                                    >
-                                        <Icon icon="iconamoon:profile" className="object-cover text-2xl"/>
-                                    </div>
+                                <div className="flex items-center gap-2">
+                                    <Logo size={36} />
                                     <div className="text-left">
-                                        <p className="font-semibold text-gray-800 dark:text-white">Guest Account</p>
-                                        <p className="text-sm text-black/60 dark:text-white/60">Sign in to sync reading progress</p>
+                                        <p className="font-extrabold text-lg text-gray-800 dark:text-white tracking-tight">PanelVerse</p>
+                                        <p className="text-sm text-black/60 dark:text-white/60">Your local manga reader experience</p>
                                     </div>
                                 </div>
-                                <Icon 
-                                    icon="ic:round-navigate-next" 
-                                    className="text-xl text-gray-400" 
-                                />
-                            </button>
+                            </div>
                         </div>
-                    </Link>
+                    </div>
 
                     <div className="space-y-3 pb-10">
                         <Link 
-                            to="/profile" 
+                            to="/library" 
                             className="
                             w-full flex items-center justify-between bg-white/35 dark:bg-black/30 
                             border border-white/20 dark:border-white/10 rounded-2xl shadow-2xl 
                             hover:-translate-y-0.5 transition-transform backdrop-blur-md p-4 cursor-pointer"
-                        >
-                            <p className="text-base font-semibold text-gray-800 dark:text-white">Edit profile</p>
-                            <Icon 
-                                icon="ic:round-navigate-next" 
-                                className="text-xl text-gray-400" 
-                            />
-                        </Link>
-
-                        {/* <ToggleButton /> */}
-
-                        <Link 
-                            to="/library" 
-                            className="
-                                w-full flex items-center justify-between bg-white/35 dark:bg-black/30 
-                                border border-white/20 dark:border-white/10 rounded-2xl shadow-2xl 
-                                hover:-translate-y-0.5 transition-transform backdrop-blur-md p-4 cursor-pointer"
                         >
                             <p className="text-base font-semibold text-gray-800 dark:text-white">Library</p>
                             <Icon 
@@ -146,12 +121,25 @@ function Settings() {
                             />
                         </Link>
 
+                        <div 
+                            className="
+                            w-full flex items-center justify-between bg-white/35 dark:bg-black/30 
+                            border border-white/20 dark:border-white/10 rounded-2xl shadow-2xl 
+                            hover:-translate-y-0.5 transition-transform backdrop-blur-md p-4 cursor-pointer"
+                        >
+                            <p className="text-base font-semibold text-gray-800 dark:text-white">Reader</p>
+                            <Icon 
+                                icon="ic:round-navigate-next" 
+                                className="text-xl text-gray-400" 
+                            />
+                        </div>
+
                         <Link 
                             to="/about" 
                             className="
-                                w-full flex items-center justify-between bg-white/35 dark:bg-black/30 
-                                border border-white/20 dark:border-white/10 rounded-2xl shadow-2xl 
-                                hover:-translate-y-0.5 transition-transform backdrop-blur-md p-4 cursor-pointer"
+                            w-full flex items-center justify-between bg-white/35 dark:bg-black/30 
+                            border border-white/20 dark:border-white/10 rounded-2xl shadow-2xl 
+                            hover:-translate-y-0.5 transition-transform backdrop-blur-md p-4 cursor-pointer"
                         >
                             <p className="text-base font-semibold text-gray-800 dark:text-white">About</p>
                             <Icon icon="ic:round-navigate-next" className="text-xl text-gray-400" />
@@ -159,9 +147,8 @@ function Settings() {
 
                         <div 
                             className="
-                                w-full bg-white/35 dark:bg-black/30 border border-white/20 dark:border-white/10 
-                                rounded-2xl shadow-2xl backdrop-blur-md p-4
-                            "
+                            w-full bg-white/35 dark:bg-black/30 border border-white/20 dark:border-white/10 
+                            rounded-2xl shadow-2xl backdrop-blur-md p-4"
                         >
                             <p className="text-base font-semibold text-gray-800 dark:text-white">Backup & Restore</p>
                             <p className="text-sm text-black/60 dark:text-white/60 mt-1">

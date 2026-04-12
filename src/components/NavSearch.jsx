@@ -61,7 +61,7 @@ const NavSearch = ({ variant = "desktop", onClose }) => {
   if (variant === "desktop") {
     return (
       <div ref={searchRef} className="relative w-full max-w-md">
-        <div className="flex items-center gap-1 bg-(--main) dark:bg-(--component) rounded-lg px-3 py-1 shadow-sm w-full">
+        <div className="flex items-center gap-1 bg-(--component) rounded-lg px-3 py-1 shadow-sm w-full">
             <Icon icon="ep:search" className="text-slate-600 dark:text-gray-300"/>
             <input
                 type="text" 
@@ -81,7 +81,7 @@ const NavSearch = ({ variant = "desktop", onClose }) => {
               shadow-lg max-h-80 overflow-y-auto custom-scrollbar z-50"
           >
             {loading ? (
-              <p className="dark:text-gray-200">Loadng...</p>
+              <p className="p-3 text-sm dark:text-gray-200">Loadng...</p>
             ) : mangas.length > 0 ? (
               mangas.map((manga) => (
                 <Link

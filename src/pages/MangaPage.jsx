@@ -133,7 +133,7 @@ const MangaPage = () => {
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-(--main)">
-                <Icon icon="eos-icons:loading" className="text-6xl text-action dark:text-gray-600"/>
+                <Icon icon="eos-icons:loading" className="text-6xl text-(--action-hover)"/>
             </div>
         );
     }
@@ -178,7 +178,7 @@ const MangaPage = () => {
                             onClick={() => setOpen(true)}
                         >
                             <img 
-                                src={manga.imageThumb}
+                                src={manga.imageFull}
                                 alt={manga.title} 
                                 className="
                                 w-full h-full sm:h-60 object-cover rounded 
@@ -308,7 +308,7 @@ const MangaPage = () => {
 
         {open && (
             <div
-                className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center"
+                className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center"
                 onClick={() => setOpen(false)}
             >
                 {/* Stop click bubbling */}
