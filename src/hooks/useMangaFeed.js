@@ -46,13 +46,13 @@ export function useMangaFeed({
           setHasMore(false);    // disable loadmore completely for search
         }
 
+        setInitialLoading(false);
+
       } catch (err) {
         console.error(err);
         setInitialError("Failed to load manga");
         setMangas([]);
         setHasMore(false);
-      } finally {
-        setInitialLoading(false);
       }
     };
 

@@ -35,7 +35,7 @@ const Card = ({manga, onClick}) => {
         </div>
         <div className="p-2 sm:p-4 flex items-center">
             <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-semibold text-gray-800 dark:text-white truncate">
+                <h3 className="text-sm font-semibold text-(--text-main) truncate">
                     {manga.title || "Unknown title"}
                 </h3>
             </div>

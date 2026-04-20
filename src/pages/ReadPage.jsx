@@ -1,195 +1,201 @@
-// src/pages/ChapterReader.jsx
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { getAllChapters, getChapterPages } from "../api/manga";
-import Navbar from "../components/Navbar";
-import { Icon } from "@iconify/react";
-import { getChapterLabel } from "../utils/formatChapter";
-import { getMangaProgress, setMangaProgress } from "../utils/storageService";
+import ShowUIBar from "../components/ShowUIBar";
+import ReaderSettingsModal from "../components/ReaderSettingsModal";
+import { useMangaProgress } from "../hooks/useMangaProgress";
+import { useReaderSettings } from "../hooks/useReaderSettings";
+import { useChapterPages } from "../hooks/useChapterPages";
+import { useChapters } from "../hooks/useChapters";
+import { useChapterNavigation } from "../hooks/useChapterNavigation";
 
-const ChapterReader = () => {
-  const {mangaId, chapterId } = useParams(); // from route like /chapter/:id
+const ReadPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [chapters, setChapters] = useState(
+  const { mangaId, chapterId } = useParams();
+  const { pages, loading, error } = useChapterPages(chapterId);
+  const { chapters } = useChapters(
+    mangaId,
     location.state?.chapters || []
   );
-  const [pages, setPages] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  // Optional metadata forwarded from MangaPage to persist non-library card info.
-  const mangaMeta = location.state?.manga || null;
-  const hasStoredTitle =
-    typeof mangaMeta?.title === "string" && mangaMeta.title.trim().length > 0;
-
-  useEffect(() => {
-    // If chapter list wasn't passed through route state, fetch it here
-    // so Prev/Next chapter navigation still works after refresh/direct visit.
-    if (chapters.length > 0) return;
-
-      getAllChapters(mangaId)
-        .then(setChapters)
-        .catch(() => setError("Faied to fetch chapters"));
-  }, [chapters.length, mangaId]);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const fetchManga = async () => {
-        try {
-        if (isMounted) {
-          setLoading(true);
-          setError(null);
-        }
-
-        const data = await getChapterPages(chapterId);
-        if (isMounted) setPages(data);
-      } catch {
-        if (isMounted) setError("Failed to load chapter pages");
-      } finally {
-        if (isMounted) setLoading(false);
-      }
-    };
-
-    fetchManga();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [chapterId]);
-
-  const currentIndex = chapters.findIndex(
-    (ch) => ch.id === chapterId
-  );
-
-  const prevChapter = 
-    currentIndex !== -1 ? chapters[currentIndex - 1] : null;
-
-  const nextChapter = 
-    currentIndex !== -1 ? chapters[currentIndex + 1] : null;
-
-  const currentChapter = currentIndex !== -1 ? chapters[currentIndex] : null;
-  const chapterLabel = currentChapter ? getChapterLabel(currentChapter) : "";
+  const {
+    prevChapter,
+    nextChapter,
+    chapterLabel,
+    goNextChapter,
+    goPrevChapter,
+  } = useChapterNavigation({
+    mangaId,
+    chapterId,
+    chapters,
+  });
 
   const [activeIdx, setActiveIdx] = useState(0);
-  const [didRestorePage, setDidRestorePage] = useState(false);
+  const [loadedPages, setLoadedPages] = useState({});
+
+  const [showUi, setShowUi] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [pageMeta, setPageMeta] = useState({});
   const pageRefs = useRef([]);
 
-  const scrollToPage = (idx, behavior = "smooth") => {
-    const target = pageRefs.current[idx];
-    if (target) {
-      target.scrollIntoView({ behavior, block: "start" });
-      setActiveIdx(idx);
+  const mangaMeta = location.state?.manga || null;
+
+  const preloadedRef = useRef(new Set());
+
+  const {
+    readingMode,
+    setReadingMode,
+    displayMode,
+    setDisplayMode,
+    direction,
+    setDirection,
+    backgroundColors,
+    setBackgroundColors,
+    progressBar,
+    setProgressBar,
+    progressBarPosition,
+    setProgressBarPosition
+  } = useReaderSettings();
+
+  const scrollToPage = useCallback(
+    (idx, behavior = "smooth") => {
+      if (idx < 0 || idx >= pages.length) return false;
+
+      if (readingMode === "single") {
+        setActiveIdx(idx);
+        return true;
+      }
+
+      const target = pageRefs.current[idx];
+      if (target) {
+        target.scrollIntoView({ behavior, block: "start" });
+      } else {
+        setActiveIdx(idx);
+      }
+      return true;
+    },
+    [pages.length, readingMode]
+  );
+
+  const handleImageLoad = useCallback((idx, e) => {
+    if (!e?.target) return;
+
+    const img = e.target;
+
+    setLoadedPages((prev) => ({
+      ...prev,
+      [idx]: true,
+    }));
+
+    setPageMeta((prev) => ({
+      ...prev,
+      [idx]: {
+        isWide: img.naturalWidth / img.naturalHeight > 1.2,
+      },
+    }));
+  }, []);
+
+  useMangaProgress({
+    mangaId,
+    chapterId,
+    pages,
+    activeIdx,
+    mangaMeta,
+    scrollToPage,
+  });
+
+  const goNext = useCallback(() => {
+    if (!pages.length) return;
+
+    const delta = direction === "rtl" ? -1 : 1;
+    const nextIdx = activeIdx + delta;
+
+    if (!scrollToPage(nextIdx)) {
+      goNextChapter();
     }
-  };
+  }, [pages.length, direction, activeIdx, scrollToPage, goNextChapter]);
 
-  const getVisiblePagination = (total, active) => {
-    // Collapse pagination for long chapters, but keep neighbors around active page.
-    if (total <= 7) return Array.from({ length: total }, (_, i) => i);
+  const goPrev = useCallback(() => {
+    if (!pages.length) return;
 
-    const items = new Set([0, total - 1]);
-    for (let i = active - 2; i <= active + 2; i++) {
-      if (i > 0 && i < total - 1) items.add(i);
+    const delta = direction === "rtl" ? 1 : -1;
+    const prevIdx = activeIdx + delta;
+
+    if (!scrollToPage(prevIdx)) {
+      goPrevChapter();
     }
-
-    return Array.from(items).sort((a, b) => a - b);
-  };
+  }, [pages.length, direction, activeIdx, scrollToPage, goPrevChapter]);
 
   useEffect(() => {
-    // Reset pagination state when a new chapter is loaded.
-    setActiveIdx(0);
-    setDidRestorePage(false);
-    pageRefs.current = [];
+    const handleKeyDown = (e) => {
+      if (showUi) return;
+
+      const key = e.key.toLowerCase();
+
+      const isNext = key === "d" || key === "arrowright";
+      const isPrev = key === "a" || key === "arrowleft";
+
+      if (!isNext && !isPrev) return;
+
+      e.preventDefault();
+
+      if (isNext) {
+        goNext();
+      }
+
+      if (isPrev) {
+        goPrev();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [showUi, goNext, goPrev]);
+
+  useEffect(() => {
+    const frameId = requestAnimationFrame(() => {
+      setActiveIdx(0);
+      setLoadedPages({});
+      setPageMeta({});
+      setShowUi(false);
+      pageRefs.current = [];
+    });
+
+    return () => {
+      cancelAnimationFrame(frameId);
+    };
   }, [chapterId]);
 
   useEffect(() => {
-    if (!pages.length || didRestorePage) return;
+    if (!pages.length || readingMode === "single") return;
 
-    const parsed = getMangaProgress(mangaId);
-
-    try {
-      const savedCurrentChapterId = parsed?.currentChapterId || parsed?.chapterId;
-      const savedChapterProgress = parsed?.chapters?.[chapterId];
-      const sameChapter = savedCurrentChapterId === chapterId;
-      const savedPage = Number(
-        savedChapterProgress?.lastPage ?? parsed?.page
-      );
-      const hasValidPage = Number.isInteger(savedPage) && savedPage >= 0 && savedPage < pages.length;
-
-      if (sameChapter && hasValidPage) {
-        scrollToPage(savedPage, "auto");
-      }
-    } catch {
-      // Ignore malformed progress data.
-    } finally {
-      setDidRestorePage(true);
-    }
-  }, [pages, didRestorePage, mangaId, chapterId]);
-
-  useEffect(() => {
-    if (!didRestorePage) return;
-
-    const parsed = getMangaProgress(mangaId);
-
-    const chaptersProgress =
-      parsed?.chapters && typeof parsed.chapters === "object" ? parsed.chapters : {};
-    const updatedAt = Date.now();
-    const existingTitle = typeof parsed?.title === "string" ? parsed.title.trim() : "";
-    const existingThumb = parsed?.imageThumb;
-    const existingMedium = parsed?.imageMedium;
-    // Treat placeholder images as "missing" so real metadata can replace them.
-    const hasExistingThumb = typeof existingThumb === "string" && existingThumb !== "/placeholder.jpg";
-    const hasExistingMedium = typeof existingMedium === "string" && existingMedium !== "/placeholder.jpg";
-
-    chaptersProgress[chapterId] = {
-      lastPage: activeIdx,
-      totalPages: pages.length,
-      completed: pages.length > 0 && activeIdx >= pages.length - 1,
-      updatedAt,
-    };
-
-    setMangaProgress(mangaId, {
-      ...parsed,
-      currentChapterId: chapterId,
-      chapterId, // legacy compatibility
-      // Keep prior real metadata, but fill any missing fields from current route state.
-      title: existingTitle || (hasStoredTitle ? mangaMeta.title.trim() : null),
-      imageThumb: hasExistingThumb ? existingThumb : (mangaMeta?.imageThumb || "/placeholder.jpg"),
-      imageMedium: hasExistingMedium ? existingMedium : (mangaMeta?.imageMedium || mangaMeta?.imageThumb || "/placeholder.jpg"),
-      page: activeIdx,
-      updatedAt,
-      chapters: chaptersProgress,
-    });
-  }, [didRestorePage, mangaId, chapterId, activeIdx, pages.length, mangaMeta]);
-
-  useEffect(() => {
-    if (!pages.length) return;
-
-    // Tracks which image is "current" while scrolling (works for both manga pages
-    // and extra-tall manhwa/webtoon pages).
     const observer = new IntersectionObserver(
       (entries) => {
-        const visibleEntries = entries.filter((entry) => entry.isIntersecting);
-        if (!visibleEntries.length) return;
+        let bestMatch = null;
+        let bestRatio = 0;
 
-        // Pick the page whose center is closest to viewport center.
-        const viewportCenterY = window.innerHeight / 2;
-        const closest = visibleEntries.sort((a, b) => {
-          const aCenter = a.boundingClientRect.top + a.boundingClientRect.height / 2;
-          const bCenter = b.boundingClientRect.top + b.boundingClientRect.height / 2;
-          return Math.abs(aCenter - viewportCenterY) - Math.abs(bCenter - viewportCenterY);
-        })[0];
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          if (entry.intersectionRatio > bestRatio) {
+            bestRatio = entry.intersectionRatio;
+            bestMatch = entry;
+          }
+        }
 
-        const idx = Number(closest?.target?.dataset?.index);
+        const idx = Number(bestMatch?.target?.dataset?.index);
+
         if (Number.isFinite(idx)) {
-          setActiveIdx(idx);
+          requestAnimationFrame(() => {
+            setActiveIdx(idx);
+          });
         }
       },
       {
         root: null,
-        threshold: [0, 0.01, 0.1],
-        rootMargin: "-45% 0px -45% 0px",
+        threshold: [0.25, 0.5, 0.75, 1],
       }
     );
 
@@ -198,200 +204,268 @@ const ChapterReader = () => {
     });
 
     return () => observer.disconnect();
-  }, [pages, chapterId]);
+  }, [pages, readingMode]);
+
+  useEffect(() => {
+    if (!pages.length) return;
+
+    const targets = direction === "rtl"
+      ? [activeIdx - 1, activeIdx - 2]
+      : [activeIdx + 1, activeIdx + 2];
+
+      targets
+        .filter((i) => i >= 0 && i < pages.length)
+        .forEach((i) => {
+          if (preloadedRef.current.has(i)) return;
+
+          const src = pages[i]?.image;
+          if(!src) return;
+
+          const img = new Image();
+          img.src = src;  // browser starts fetching + caching
+          preloadedRef.current.add(i);
+        });
+  }, [activeIdx, pages, direction]);
 
   const handleBack = () => {
     navigate(`/manga/${mangaId}`);
-  }
-
-  if (loading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-(--main)">
-                <Icon icon="eos-icons:loading" className="text-6xl text-(--action-hover)"/>
-            </div>
-        );
-    }
-  
-  if (error) {
-    return (
-      <div 
-        className="
-        min-h-screen flex flex-col gap-2 items-center justify-center
-         text-center py-6 text-red-500bg-main dark:bg-main-dark dark:text-red-600"
-      >
-        {error}
-
-        <button 
-          onClick={handleBack} 
-          className="
-          text-white dark:text-white px-2 py-2 bg-(--component)
-          hover:bg-(--component-hover) rounded-lg cursor-pointer"
-        >
-          Go back
-        </button>
-      </div>
-    )
-  }
+  };
 
   return (
-
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
-
-      <main className="flex-1 items-center pt-20 bg-(--main)">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center gap-3 w-full mb-4">
-            <button 
-              onClick={handleBack} 
-              className="
-              p-2 rounded-full bg-black/5 dark:bg-white/10 text-gray-700
-              dark:text-gray-200 hover:text-gray-900 dark:hover:text-gray-400 transition cursor-pointer"
-              aria-label="Go back"
-            >
-              <Icon icon="eva:arrow-back-fill"/>
-            </button>
-            <span className="text-[11px] font-black tracking-[0.2em] uppercase text-black/70 dark:text-white/70">
-              Chapter Reader
-            </span>
-            <span className="h-px flex-1 bg-black/20 dark:bg-white/20" />
+    <div 
+      className={`
+        flex-1 min-h-screen flex flex-col pt-20
+        ${
+          backgroundColors === "black" ? "bg-black" :
+          backgroundColors === "gray" ? "bg-gray-300" :
+          backgroundColors === "white" ? "bg-white" :
+          "bg-(--main)"
+        }
+      `}
+    >
+      {/* LOADING STATE (FULL CENTER FIX) */}
+      {loading ? (
+        <div className="flex-1 flex items-center justify-center">
+          <div className="flex flex-col items-center justify-center gap-3">
+            <div className="w-10 h-10 border-4 border-(--action-hover) border-t-transparent rounded-full animate-spin" />
+            <p className="text-sm text-(--text-muted)">
+              Loading chapter...
+            </p>
           </div>
         </div>
+      ) : error ? (
+        /* ERROR STATE */
+        <div className="flex-1 flex items-center justify-center text-center">
+          <div className="flex flex-col gap-3">
+            <p className="text-red-500 dark:text-red-600">{error}</p>
 
-        <div className="flex flex-col items-center bg-main dark:bg-main-dark min-h-screen py-6 gap-4">
-          <h2 
-            className="
-            text-gray-800 dark:text-gray-200 font-semibold bg-white/35 
-            dark:bg-black/30 border border-white/20 dark:border-white/10 
-            rounded-full px-4 py-2 backdrop-blur-md shadow-2xl"
+            <button
+              onClick={handleBack}
+              className="px-3 py-2 bg-(--action) hover:bg-(--action-hover) text-white rounded-lg cursor-pointer"
+            >
+              Go back
+            </button>
+          </div>
+        </div>
+      ) : (
+        /* MAIN READER */
+        <div className="flex-1 relative">
+          <div
+            className={`
+              relative py-6
+              ${readingMode === "single"
+                ? "flex justify-center items-center"
+                : "flex flex-col items-center gap-4"
+              }
+            `}
           >
-            {chapterLabel}
-          </h2>
+            {/* TAP ZONES */}
+            <div className="fixed inset-x-0 top-0 bottom-12 z-10 flex pointer-events-none">
+              <div
+                className="w-1/3 h-full pointer-events-auto"
+                onClick={() => !showUi && goPrev()}
+              />
+              <div
+                className="w-1/3 h-full pointer-events-auto"
+                onClick={() => setShowUi(prev => !prev)}
+              />
+              <div
+                className="w-1/3 h-full pointer-events-auto"
+                onClick={() => !showUi && goNext()}
+              />
+            </div>
 
-          {pages.length === 0 && !loading && (
-            <p className="text-center text-gray-500 dark:text-gray-400 mt-6">
-              This chapter has no pages available.
-            </p>
-          )}
-
-          {pages.map((page, i) => (
-            <img
-              key={i}
-              // Keep stable refs per page for observer + dot click navigation.
-              ref={(el) => (pageRefs.current[i] = el)}
-              data-index={i}
-              src={page.image}
-              alt={`Page ${i + 1}`}
-              className="w-full max-w-3xl rounded-lg shadow-lg"
-              loading="lazy"
+            <ShowUIBar
+              showUI={showUi}
+              setShowUI={setShowUi}
+              activeIdx={activeIdx}
+              setActiveIdx={setActiveIdx}
+              pages={pages}
+              scrollToPage={scrollToPage}
+              chapterTitle={mangaMeta?.title || "Unknown Manga"}
+              chapterLabel={chapterLabel}
+              chapters={chapters}
+              mangaMeta={mangaMeta}
+              mangaId={mangaId}
+              currentChapterId={chapterId}
+              prevChapter={prevChapter}
+              nextChapter={nextChapter}
+              readingMode={readingMode}
+              setReadingMode={setReadingMode}
+              displayMode={displayMode}
+              setDisplayMode={setDisplayMode}
+              direction={direction}
+              setDirection={setDirection}
+              onOpenSettings={() => setShowSettings(true)}
             />
-          ))}
 
-          {pages.length > 1 && (
-          <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[min(92vw,900px)]">
-            <div className="flex items-center justify-between gap-3">
-              <div 
-                className="
-                bg-white/35 dark:bg-black/30 border border-white/20 dark:border-white/10 
-                rounded-full px-4 py-2 backdrop-blur-md shadow-2xl"
-              >
-                <button
-                  disabled={!prevChapter}
-                  onClick={() =>
-                    navigate(`/read/${mangaId}/${prevChapter.id}`, {
-                      state: { chapters, manga: mangaMeta },
-                    })
-                  }
-                  className={`transition ${
-                    prevChapter
-                      ? "text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-gray-400 cursor-pointer"
-                      : "text-gray-400 cursor-not-allowed"
-                  }`}
+            <ReaderSettingsModal
+              isOpen={showSettings} 
+              onClose={() => setShowSettings(false)}
+              readingMode={readingMode}
+              setReadingMode={setReadingMode}
+              displayMode={displayMode}
+              setDisplayMode={setDisplayMode}
+              direction={direction}
+              setDirection={setDirection}
+
+              backgroundColors={backgroundColors}
+              setBackgroundColors={setBackgroundColors}
+              progressBar={progressBar}
+              setProgressBar={setProgressBar}
+              progressBarPositon={progressBarPosition}
+              setProgressBarPosition={setProgressBarPosition}
+            />
+
+            {pages.map((page, i) => {
+              const isHidden =
+                readingMode === "single" && i !== activeIdx;
+              const isWide = pageMeta[i]?.isWide;
+
+              return (
+                <div
+                  key={i}
+                  className={`
+                    relative w-full flex justify-center items-center px-2
+                    ${!loadedPages[i] ? "min-h-[70vh]" : ""}
+                    ${isHidden ? "hidden" : ""}
+                  `}
                 >
-                  Prev
-                </button>
-              </div>
-
-              <div 
-                className="
-                bg-white/35 dark:bg-black/30 border border-white/20 dark:border-white/10
-                rounded-full px-2.5 py-2 backdrop-blur-md shadow-2xl w-[min(52vw,360px)] md:w-auto"
-              >
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <span 
-                    className="
-                    text-[10px] sm:text-xs font-semibold text-gray-600 
-                    dark:text-gray-300 tabular-nums min-w-5 text-left"
-                  >
-                    {activeIdx + 1}
-                  </span>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-center gap-2 overflow-hidden">
-                      {getVisiblePagination(pages.length, activeIdx).map((idx, i, arr) => {
-                        const prev = arr[i - 1];
-                        const needsGap = typeof prev === "number" && idx - prev > 1;
-
-                        return (
-                          <span key={idx} className="flex items-center gap-2">
-                            {needsGap && (
-                              <span className="text-xs text-gray-500 dark:text-gray-400">...</span>
-                            )}
-                            <button
-                              type="button"
-                              onClick={() => scrollToPage(idx)}
-                              className="p-2 -m-2"
-                              aria-label={`Go to page ${idx + 1}`}
-                            >
-                              <span
-                                className={`block h-2 w-2 rounded-full transition-all duration-300 ${
-                                  idx === activeIdx
-                                    ? "w-8 bg-main dark:bg-main-dark"
-                                    : "bg-main/30 dark:bg-main-dark/30 hover:bg-main/50 dark:hover:bg-main-dark/50"
-                                }`}
-                              />
-                            </button>
-                          </span>
-                        );
-                      })}
+                  {/* Skeleton (centered properly now) */}
+                  {!loadedPages[i] && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="flex flex-col items-center justify-center gap-3">
+                        <div className="w-10 h-10 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                      </div>
                     </div>
-                  </div>
-                  <span 
-                    className="
-                    text-[10px] sm:text-xs font-semibold text-gray-600
-                    dark:text-gray-300 tabular-nums min-w-5 text-right"
-                  >
-                    {pages.length}
-                  </span>
-                </div>
-              </div>
+                  )}
 
-              <div 
-                className="
-                bg-white/35 dark:bg-black/30 border border-white/20 
-                dark:border-white/10 rounded-full px-4 py-2 backdrop-blur-md shadow-2xl"
-              >
-                <button
-                  disabled={!nextChapter}
-                  onClick={() =>
-                    navigate(`/read/${mangaId}/${nextChapter.id}`, {
-                      state: { chapters, manga: mangaMeta },
-                    })
-                  }
-                  className={`transition ${
-                    nextChapter
-                      ? "text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-gray-400 cursor-pointer"
-                      : "text-gray-400 cursor-not-allowed"
-                  }`}
+                  {/* Image */}
+                  <img
+                    ref={(el) => (pageRefs.current[i] = el)}
+                    data-index={i}
+                    src={page.image}
+                    alt={`Page ${i + 1}`}
+                    className={`
+                      block mx-auto rounded-lg shadow-lg
+                      ${
+                        displayMode === "original" && !isWide
+                          ? "w-auto max-w-full object-contain"
+                          : "w-full max-w-full object-contain"
+                      }
+                      ${
+                        displayMode === "width"
+                          ? "w-full"
+                          : ""
+                      }
+                      ${
+                        displayMode === "screen"
+                          ? "max-h-screen object-contain"
+                          : ""
+                      }
+                      ${loadedPages[i] ? "opacity-100" : "opacity-0"}
+                    `}
+                    loading="lazy"
+                    onLoad={(e) =>
+                      requestAnimationFrame(() =>
+                        handleImageLoad(i, e)
+                      )
+                    }
+                  />
+                </div>
+              );
+            })}
+
+            {/* Pagination */}
+            <div 
+              className={`
+                fixed z-20 pointer-events-none
+                ${progressBarPosition === "bottom"
+                  ? "bottom-0 left-0 w-full px-2 py-2 "
+                  : progressBarPosition === "left"
+                  ? "left-0 top-20 h-[calc(100%-5rem)] flex flex-col px-2 py-2 "
+                  : "right-0 top-20 h-[calc(100%-5rem)] flex flex-col px-2 py-2"
+                }
+              `}
+            >
+              {progressBar === "standard" ? (
+                // Progress bar
+                <div 
+                  className={`
+                    flex gap-0.5 
+                    ${progressBarPosition === "bottom" ? "flex-row" : "flex-col h-full"}
+                    ${direction === "rtl" ? "flex-row-reverse" : ""}
+                  `}
                 >
-                  Next
-                </button>
-              </div>
+                  {pages.map((_, idx) => {
+                    const isActive = activeIdx === idx;
+
+                    return (
+                      <div
+                        key={idx}
+                        onClick={() =>
+                          readingMode === "single"
+                            ? setActiveIdx(idx)
+                            : scrollToPage(idx)
+                        }
+                        className={`
+                          rounded-full transition-all duration-200 cursor-pointer pointer-events-auto
+                          ${progressBarPosition === "bottom"
+                            ? "flex-1 h-1"
+                            : "w-1.5 flex-1"
+                          }
+                          ${
+                            isActive
+                              ? "bg-(--action-alt) scale-y-125"
+                              : "bg-(--component) hover:bg-(--component-hover)"
+                          }
+                        `}
+                      />
+                    )
+                  })}
+                </div>
+              ) : (
+                // Hidden mode
+                <div
+                  className={`
+                    pointer-events-auto
+                    ${progressBarPosition === "bottom"
+                      ? "flex justify-center"
+                      : "flex items-center justify-center h-full"
+                    }
+                  `}
+                >
+                  <div className="px-3 py-1 rounded-lg bg-(--component)/20 text-(--text-main) text-sm backdrop-blur-lg shadow-xl">
+                    {activeIdx + 1} / {pages.length}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
-          )}         
         </div>
-      </main>
+      )}
     </div>
   );
 };
 
-export default ChapterReader;
+export default ReadPage;

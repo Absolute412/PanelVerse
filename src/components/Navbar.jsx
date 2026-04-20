@@ -53,7 +53,7 @@ function Navbar() {
     const [isMobileOpen, setIsMobileOpen] = useState(false);
 
     return(
-        <nav className="fixed top-0 w-full z-50 ">
+        <nav className="fixed top-0 w-full z-50">
             <div 
                 className="
                 absolute inset-0 bg-(--main)/60 dark:bg-(--main)/90 backdrop-blur-lg 
@@ -64,7 +64,7 @@ function Navbar() {
                     to="/" 
                     className="
                     text-lg sm:text-xl font-black tracking-tight hover:cursor-pointer 
-                    text-slate-900 dark:text-white hover:text-slate-700 dark:hover:text-gray-300"
+                    text-(--text-main)"
                 >
                     <div className="flex items-center gap-2">
                         <PanelVerseLogo size={32} />
@@ -78,9 +78,9 @@ function Navbar() {
                             key={item.path}
                             to={item.path}
                             className={({ isActive }) =>
-                                `text-slate-800 dark:text-white/90 hover:text-slate-900 dark:hover:text-white
+                                `text-(--text-main) hover:text-(--text-muted)
                                 ${isActive
-                                    ? "text-slate-900 dark:text-white border-b-2 border-(--action)" : ""
+                                    ? "border-b-2 border-(--action)" : ""
                                 }`
                             }
                         >
@@ -96,17 +96,17 @@ function Navbar() {
 
                 <button 
                     onClick={() => setIsOpen(!isOpen)} 
-                    className="md:hidden p-2 rounded-lg bg-black/5 dark:bg-white/10"
+                    className="md:hidden p-2 rounded-lg bg-black/5 dark:bg-white/10 cursor-pointer"
                 >
                     <Icon 
                         icon={isOpen ? "material-symbols:close-rounded" : "stash:burger-classic-duotone"} 
-                        className="text-2xl text-slate-900 dark:text-white"
+                        className="text-2xl text-(--text-main) hover:text-(--text-muted)"
                     />
                 </button>
             </div>
 
             {isOpen && (
-                <div className="md:hidden relative z-10 px-4 pb-4 space-y-3">
+                <div className="md:hidden relative z-10 px-4 sm:px-6 pb-4 space-y-3">
                     <div className="flex flex-col gap-3 text-lg">
                         {mobileNavItems.map((item) => (
                             <NavLink
@@ -114,7 +114,7 @@ function Navbar() {
                                 to={item.path}
                                 className={({ isActive }) =>
                                     `text-lg py-1 ${
-                                        isActive ? "text-(--action) font-bold" : "text-slate-800 dark:text-white"
+                                        isActive ? "text-(--action) font-bold" : "text-(--text-main) hover:text-(--text-muted)"
                                     }`
                                 }
                             >
@@ -128,7 +128,7 @@ function Navbar() {
                             onClick={() => setIsMobileOpen(true)}
                             className="
                             flex items-center justify-center gap-1 w-full text-slate-700 dark:text-white 
-                            bg-(--component) border-white/30 dark:border-white/10 px-3 py-2 rounded-lg shadow-sm"
+                            bg-(--component) border-white/30 dark:border-white/10 px-3 py-2 rounded-lg shadow-sm cursor-pointer"
                         >
                             <Icon icon="ep:search" />
                             <span className="text-left flex-1">Search manga...</span>

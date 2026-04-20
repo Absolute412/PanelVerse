@@ -27,8 +27,12 @@ export const LibraryProvider = ({children}) => {
         setLibrary(prev => prev.filter(m => m.id !== id));
     }
 
+    const clearLibrary = () => {
+        setLibrary([]);
+    };
+
   return (
-    <LibraryContext.Provider value={{library, addToLibrary, removeFromLibrary}}>
+    <LibraryContext.Provider value={{library, addToLibrary, removeFromLibrary, clearLibrary}}>
         {children}
     </LibraryContext.Provider>
   )

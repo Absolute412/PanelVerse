@@ -50,36 +50,36 @@ function DropDownMenu () {
                     <div className="flex items-center gap-3 rounded-xl bg-black/5 dark:bg-white/5 px-3 py-2 mb-3">
                         <PanelVerseLogo size={32} />
                         <div className="leading-tight">
-                            <h4 className="font-extrabold text-base text-gray-800 dark:text-white">PanelVerse</h4>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">Explore the PanelVerse</p>
+                            <h4 className="font-extrabold text-base text-(--text-main)">PanelVerse</h4>
+                            <p className="text-xs text-(--text-muted)">Explore the PanelVerse</p>
                         </div>
                     </div>
 
                     <div className="flex flex-col gap-2">
-                    <Link 
-                        to="/about" 
-                        className="
-                            flex items-center justify-start gap-3 w-full px-3 py-2 text-sm font-medium text-gray-700
-                            dark:text-gray-200 hover:bg-(--component) rounded-lg transition-colors
-                        ">
-                        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-black/5 dark:bg-white/5">
-                            <Icon icon="mdi:about-circle-outline" className="text-lg"/>
-                        </span> 
-                        About
-                    </Link>
-                    <Link 
-                        to="/settings" 
-                        className="
-                            flex items-center justify-start gap-3 w-full px-3 py-2 text-sm font-medium text-gray-700 
-                            dark:text-gray-200 hover:bg-(--component) rounded-lg transition-colors
-                        ">
-                        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-black/5 dark:bg-white/5">
-                            <Icon icon="line-md:cog-loop" className="text-lg"/>
-                        </span> 
-                        Settings
-                    </Link>
-                    <div className="h-px bg-black/10 dark:bg-white/10 my-1"/>
-                    <ToggleTheme />
+                        <Link 
+                            to="/settings" 
+                            className="
+                            flex items-center justify-start gap-3 w-full px-3 py-2 text-sm font-medium 
+                            text-(--text-main)/90 hover:bg-(--component) rounded-lg transition-colors"
+                        >
+                            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-black/5 dark:bg-white/5">
+                                <Icon icon="line-md:cog-loop" className="text-lg"/>
+                            </span> 
+                            Settings
+                        </Link>
+                        <Link 
+                            to="/about" 
+                            className="
+                            flex items-center justify-start gap-3 w-full px-3 py-2 text-sm font-medium 
+                            text-(--text-main)/90 hover:bg-(--component) rounded-lg transition-colors"
+                        >
+                            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-black/5 dark:bg-white/5">
+                                <Icon icon="mdi:about-circle-outline" className="text-lg"/>
+                            </span> 
+                            About
+                        </Link>
+                        <div className="h-px bg-black/10 dark:bg-white/10 my-1"/>
+                        <ToggleTheme />
                     </div>
                 </div>
             )}

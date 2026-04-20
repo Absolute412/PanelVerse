@@ -1,6 +1,4 @@
 import { AddButton } from "../components/AddButton";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Icon } from "@iconify/react";
 import ChapterList from "../components/ChapterList";
@@ -30,25 +28,39 @@ const MangaPage = () => {
     useEffect(() => {
         if (!mangaId) return;
 
-        setChaptersLoading(true);
-        getAllChapters(mangaId)
-        .then((data) => {
-            // Sort chapter numbers numerically while keeping non-numeric labels at the end.
-            const sortedChapters = [...data].sort((a, b) => {
-                const na = parseFloat(a.number);
-                const nb = parseFloat(b.number);
+        let isMounted = true;
 
-                if (isNaN(na) && isNaN(nb)) return 0;
-                if (isNaN(na)) return 1;
-                if (isNaN(nb)) return -1;
+        const loadChapters = async () => {
+            setChaptersLoading(true);
 
-                return na - nb;
-            });
-            setChapters(sortedChapters);
-            console.log("Fetched chapters:", data);
-        })
-        .catch(console.error)
-        .finally(() => setChaptersLoading(false));
+            try {
+                const data = await getAllChapters(mangaId);
+
+                if (!isMounted) return;
+                // Sort chapter numbers numerically while keeping non-numeric labels at the end.
+                const sortedChapters = [...data].sort((a, b) => {
+                    const na = parseFloat(a.number);
+                    const nb = parseFloat(b.number);
+
+                    if (isNaN(na) && isNaN(nb)) return 0;
+                    if (isNaN(na)) return 1;
+                    if (isNaN(nb)) return -1;
+
+                    return na - nb;
+                });
+
+                setChapters(sortedChapters);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                if (isMounted) setChaptersLoading(false);
+            }
+        };
+
+        loadChapters();
+
+        return () => { isMounted = false; };
+    
     }, [mangaId]);
 
     useEffect(() => {
@@ -132,8 +144,8 @@ const MangaPage = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-(--main)">
-                <Icon icon="eos-icons:loading" className="text-6xl text-(--action-hover)"/>
+            <div className="flex flex-col items-center justify-center min-h-screen">
+                <div className="w-10 h-10 border-4 border-(--action-hover) border-t-transparent rounded-full animate-spin"></div>
             </div>
         );
     }
@@ -141,7 +153,7 @@ const MangaPage = () => {
     if (!manga) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-(--main)">
-                <p className="text-gray-600 dark:text-white">Manga not found</p>
+                <p className="text-(--text-main)">Manga not found</p>
                 <button 
                     onClick={() => navigate(-1)} 
                     className="mt-4 text-blue-500 cursor-pointer"
@@ -153,13 +165,12 @@ const MangaPage = () => {
     }
 
   return (
-    <div className="min-h-screen flex flex-col bg-(--main)">
-        <Navbar />
+    <>
         <div className="flex-1">
             <div className="pt-20 pb-16 px-4 sm:px-6">
                 <div className="flex flex-col">
                     <div className="flex items-center gap-3 w-full mb-4">
-                        <span className="text-[11px] font-black tracking-[0.2em] uppercase text-black/70 dark:text-white/70">
+                        <span className="text-[11px] font-black tracking-[0.2em] uppercase text-(--text-main)/70">
                             Manga Details
                         </span>
                         <span className="h-px flex-1 bg-black/20 dark:bg-white/20" />
@@ -203,7 +214,7 @@ const MangaPage = () => {
                             <h2 
                                 className="
                                 text-base sm:text-3xl font-extrabold tracking-tight 
-                                mb-2 text-gray-800 dark:text-white"
+                                mb-2 text-(--text-main)"
                             >
                                 {manga.title}
                             </h2>
@@ -211,7 +222,7 @@ const MangaPage = () => {
                             <div 
                                 className="
                                 flex flex-wrap items-center gap-2 sm:gap-3 text-[10px] 
-                                sm:text-[12px] font-semibold text-black/70 dark:text-white/70 mb-3"
+                                sm:text-[12px] font-semibold text-(--text-main)/70 mb-3"
                             >
                                 <span 
                                     className="
@@ -235,7 +246,7 @@ const MangaPage = () => {
                             <p 
                                 className="
                                 mt-1 flex-1 overflow-y-auto overflow-x-hidden wrap-break-word 
-                                pr-2 text-sm sm:text-base text-gray-800/90 dark:text-gray-100/90 
+                                pr-2 text-sm sm:text-base text-(--text-muted)
                                 custom-scrollbar min-h-0 max-h-24 sm:max-h-40 md:max-h-none"
                             >
                                 {manga.description || "No description available."}
@@ -276,8 +287,8 @@ const MangaPage = () => {
                                     <span 
                                         key={index} 
                                         className="
-                                        bg-black/10 dark:bg-white/10 text-black 
-                                        dark:text-gray-200 text-[10px] font-black px-3 py-1 rounded-full"
+                                        bg-black/10 dark:bg-white/10 text-(--text-main)
+                                        text-[10px] font-black px-3 py-1 rounded-full"
                                     >
                                         {genre}
                                     </span>
@@ -313,7 +324,9 @@ const MangaPage = () => {
             >
                 {/* Stop click bubbling */}
                 <div
-                    className="relative w-[85vw] max-w-[85vw] max-h-[70vh] sm:w-auto sm:max-w-5xl sm:max-h-[90vh] flex items-center justify-center pointer-events-auto"
+                    className="
+                    relative w-[85vw] max-w-[85vw] max-h-[70vh] sm:w-auto sm:max-w-5xl 
+                    sm:max-h-[90vh] flex items-center justify-center pointer-events-auto"
                     role="dialog"
                     aria-modal="true"
                     onClick={(e) => e.stopPropagation()}
@@ -327,7 +340,9 @@ const MangaPage = () => {
                     {/* Close button */}
                     <button
                         onClick={() => setOpen(false)}
-                        className="absolute top-2 right-2 sm:-top-4 sm:-right-4 bg-black/70 hover:bg-black text-white p-2 rounded-full"
+                        className="
+                        absolute top-2 right-2 sm:-top-4 sm:-right-4 bg-black/70 hover:bg-black 
+                        text-white p-2 rounded-full cursor-pointer"
                         aria-label="Close image"
                     >
                         <Icon 
@@ -338,8 +353,7 @@ const MangaPage = () => {
                 </div>
             </div>
         )}
-        <Footer />
-    </div>
+    </>
   )
 }
 

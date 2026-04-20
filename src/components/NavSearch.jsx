@@ -62,7 +62,7 @@ const NavSearch = ({ variant = "desktop", onClose }) => {
     return (
       <div ref={searchRef} className="relative w-full max-w-md">
         <div className="flex items-center gap-1 bg-(--component) rounded-lg px-3 py-1 shadow-sm w-full">
-            <Icon icon="ep:search" className="text-slate-600 dark:text-gray-300"/>
+            <Icon icon="ep:search" className="text-(--text-muted)"/>
             <input
                 type="text" 
                 value={searchTerm}
@@ -71,7 +71,7 @@ const NavSearch = ({ variant = "desktop", onClose }) => {
                   setSearchTerm(e.target.value)
                   setOpen(true)
                 }}
-                className="flex-1 bg-transparent dark:text-gray-200 placeholder-slate-600 outline-none"
+                className="flex-1 bg-transparent text-(--text-muted) placeholder-(--text-muted) outline-none"
             />
         </div>
 
@@ -81,7 +81,7 @@ const NavSearch = ({ variant = "desktop", onClose }) => {
               shadow-lg max-h-80 overflow-y-auto custom-scrollbar z-50"
           >
             {loading ? (
-              <p className="p-3 text-sm dark:text-gray-200">Loadng...</p>
+              <p className="p-3 text-sm text-(--text-muted)">Loadng...</p>
             ) : mangas.length > 0 ? (
               mangas.map((manga) => (
                 <Link
@@ -94,11 +94,11 @@ const NavSearch = ({ variant = "desktop", onClose }) => {
                     alt={manga.title}
                     className="w-10 h-14 object-cover rounded"
                   />
-                  <p className="text-sm text-gray-700 dark:text-gray-200 truncate">{manga.title}</p>
+                  <p className="text-sm text-(--text-main) truncate">{manga.title}</p>
                 </Link>
               ))
             ) : (
-              <p className="p-3 text-gray-500 text-sm">No manga found</p>
+              <p className="p-3 text-(--text-muted) text-sm">No manga found</p>
             )}
           </div>
         )}

@@ -2,8 +2,8 @@ import { Icon } from "@iconify/react";
 import { useTheme } from "../contexts/ThemeContext";
 
 const ToggleTheme = ({ compact = false }) => {
-    const {isDark, setIsDark} = useTheme();
-    const toggleTheme = () => setIsDark(!isDark);
+    const { mode, setMode } = useTheme();
+    const toggleTheme = () => setMode(mode === "dark" ? "light" : "dark");
 
     if (compact) {
         return (
@@ -13,10 +13,10 @@ const ToggleTheme = ({ compact = false }) => {
                     flex items-center justify-center w-10 h-10 rounded-lg
                     bg-(--component) border border-white/20 dark:border-white/10
                     transition-all duration-200 hover:scale-105 active:scale-95"
-                aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+                aria-label={mode === "dark" ? "Switch to light mode" : "Switch to dark mode"}
             >
                 <Icon
-                    icon={isDark ? "ph:moon-stars-fill" : "ph:sun-fill"}
+                    icon={mode === "dark" ? "ph:moon-stars-fill" : "ph:sun-fill"}
                     className="text-xl text-(--accent)"
                 />
             </button>
@@ -28,14 +28,14 @@ const ToggleTheme = ({ compact = false }) => {
             <div className="flex items-center gap-2">
                 <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/70 dark:bg-white/10">
                     <Icon 
-                        icon={isDark ? "ph:moon-stars-fill" : "ph:sun-fill"} 
+                        icon={mode === "dark" ? "ph:moon-stars-fill" : "ph:sun-fill"} 
                         className="text-lg text-yellow-500 dark:text-blue-300" 
                     />
                 </span>
                 <div className="leading-tight">
-                    <p className="text-sm font-semibold text-gray-800 dark:text-white">Theme</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {isDark ? "Dark mode" : "Light mode"}
+                    <p className="text-sm font-semibold text-(--text-main)/80">Theme</p>
+                    <p className="text-xs text-(--text-muted)">
+                        {mode === "dark" ? "Dark mode" : "Light mode"}
                     </p>
                 </div>
             </div>
@@ -43,7 +43,7 @@ const ToggleTheme = ({ compact = false }) => {
                 <input
                     type="checkbox" 
                     className="sr-only peer" 
-                    checked={isDark}
+                    checked={mode === "dark"}
                     onChange={ toggleTheme }
                     aria-label="Toggle dark mode"
                 />

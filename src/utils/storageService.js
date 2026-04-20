@@ -1,7 +1,11 @@
 const STORAGE_SCHEMA_VERSION = 2;
 const SCHEMA_KEY = "pv-schema-version";
-const THEME_KEY = "theme";
+const MODE_KEY = "mode"
+const COLOR_THEME_KEY = "color-theme"
+const VALID_THEMES = ["default",  "purple", "neutral"];
 const LIBRARY_KEY = "library";
+const LIBRARY_SORT_KEY = "library-sort";
+const VALID_LIBRARY_SORTS = ["recently-added", "recently-read", "alphabetical"];
 const PROGRESS_PREFIX = "progress-";
 
 const EMPTY_PROGRESS = {
@@ -170,17 +174,26 @@ export const ensureStorageSchema = () => {
   localStorage.setItem(SCHEMA_KEY, String(STORAGE_SCHEMA_VERSION));
 };
 
-export const getThemePreference = () => {
-  ensureStorageSchema();
+export const getModePreference = () => {
   if (!isBrowser()) return "light";
-  const value = localStorage.getItem(THEME_KEY);
+  const value = localStorage.getItem(MODE_KEY);
   return value === "dark" ? "dark" : "light";
 };
 
-export const setThemePreference = (theme) => {
-  ensureStorageSchema();
+export const setModePreference = (mode) => {
   if (!isBrowser()) return;
-  localStorage.setItem(THEME_KEY, theme === "dark" ? "dark" : "light");
+  localStorage.setItem(MODE_KEY, mode === "dark" ? "dark" : "light");
+};
+
+export const getColorTheme = () => {
+  if (!isBrowser()) return "default";
+  const value = localStorage.getItem(COLOR_THEME_KEY);
+  return VALID_THEMES.includes(value) ? value : "default";
+};
+
+export const setColorTheme = (theme) => {
+  if (!isBrowser()) return;
+  localStorage.setItem(COLOR_THEME_KEY, theme || "default");
 };
 
 export const getLibraryData = () => {
@@ -202,6 +215,18 @@ export const setLibraryData = (library) => {
   ensureStorageSchema();
   if (!isBrowser()) return;
   localStorage.setItem(LIBRARY_KEY, JSON.stringify(Array.isArray(library) ? library : []));
+};
+
+export const getLibrarySortPreference = () => {
+  if (!isBrowser()) return "recently-added";
+  const value = localStorage.getItem(LIBRARY_SORT_KEY);
+  return VALID_LIBRARY_SORTS.includes(value) ? value : "recently-added";
+};
+
+export const setLibrarySortPreference = (sort) => {
+  if (!isBrowser()) return;
+  const nextSort = VALID_LIBRARY_SORTS.includes(sort) ? sort : "recently-added";
+  localStorage.setItem(LIBRARY_SORT_KEY, nextSort);
 };
 
 export const getMangaProgress = (mangaId) => {
@@ -260,6 +285,33 @@ export const getContinueReadingItems = (limit = 10) => {
   return items.slice(0, Math.max(1, limit));
 };
 
+export const clearAllReadingProgress = () => {
+  clearProgressEntries();
+};
+
+export const getReadingProgressStats = () => {
+  ensureStorageSchema();
+  if (!isBrowser()) {
+    return {
+      mangaTracked: 0,
+      chaptersTracked: 0,
+    };
+  }
+
+  let mangaTracked = 0;
+  let chaptersTracked = 0;
+
+  getProgressEntries().forEach(([, key]) => {
+    const parsed = safeParseJSON(localStorage.getItem(key), null);
+    const progress = normalizeProgress(parsed);
+
+    mangaTracked += 1;
+    chaptersTracked += Object.keys(progress.chapters || {}).length;
+  });
+
+  return { mangaTracked, chaptersTracked };
+};
+
 export const exportStorageData = () => {
   ensureStorageSchema();
   const progress = {};
@@ -274,7 +326,9 @@ export const exportStorageData = () => {
   return {
     schemaVersion: STORAGE_SCHEMA_VERSION,
     exportedAt: new Date().toISOString(),
-    theme: getThemePreference(),
+    mode: getModePreference(),
+    colorTheme: getColorTheme(),
+    librarySort: getLibrarySortPreference(),
     library: getLibraryData(),
     progress,
   };
@@ -289,13 +343,19 @@ export const importStorageData = (rawData) => {
     return { ok: false, error: "Invalid backup file format." };
   }
 
-  const hasKnownSections = "theme" in parsed || "library" in parsed || "progress" in parsed;
+  const hasKnownSections = "mode" in parsed || "colorTheme" in parsed || "librarySort" in parsed || "library" in parsed || "progress" in parsed;
   if (!hasKnownSections) {
     return { ok: false, error: "Backup is missing theme/library/progress data." };
   }
 
-  if ("theme" in parsed) setThemePreference(parsed.theme);
+  if ("mode" in parsed) setModePreference(parsed.mode);
+  if ("colorTheme" in parsed) setColorTheme(parsed.colorTheme);
+  if ("librarySort" in parsed) setLibrarySortPreference(parsed.librarySort);
   if ("library" in parsed) setLibraryData(Array.isArray(parsed.library) ? parsed.library : []);
+
+  if ("theme" in parsed && !("mode" in parsed)) {
+    setModePreference(parsed.theme);
+  }
 
   if ("progress" in parsed) {
     clearProgressEntries();

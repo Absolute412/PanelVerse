@@ -13,47 +13,38 @@ import Settings from './pages/Settings';
 import LatestReleasePage from './pages/LatestReleasePage';
 import RecentlyAddedPage from './pages/RecentlyAddedPage';
 import { ensureStorageSchema } from './utils/storageService';
+import Layout from './layout/Layout';
+import NotFound from './pages/NotFoundPage';
+import ReaderLayout from './layout/ReaderLayout';
+import Appearance from './pages/Appearance';
+import LibrarySettings from './pages/LibrarySettings';
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Home />
-  },
-  {
-    path: "/library",
-    element: <Library />
-  },
-  {
-    path: "/browse",
-    element: <Browse />
-  },
-  {
-    path: "/popular",
-    element: <PopularPage />
-  },
-  {
-    path: "/latest-release",
-    element: <LatestReleasePage />
-  },
-  {
-    path: "recently-added",
-    element: <RecentlyAddedPage />
-  },
-  {
-    path: "/about",
-    element: <About />
-  },
-  {
-    path: "/manga/:mangaId",
-    element: <MangaPage />
-  },
+    element: <Layout />,
+    errorElement: <NotFound />,
+    children: [
+      { path: "/", element: <Home /> },
+      { path: "/latest-release", element: <LatestReleasePage /> },
+      { path: "/browse", element: <Browse /> },
+      { path: "/library", element: <Library /> },
+      { path: "/popular", element: <PopularPage /> },
+      { path: "recently-added", element: <RecentlyAddedPage /> },
+      { path: "/manga/:mangaId", element: <MangaPage /> },
+      { path: "/about", element: <About /> },
+      { path: "/settings", element: <Settings /> },
+      { path: "/settings/appearance", element: <Appearance /> },
+      { path: "/settings/library", element: <LibrarySettings /> },
+      { path: "*", element: <NotFound />},
+    ]
+  }, 
   {
     path: "/read/:mangaId/:chapterId",
-    element: <ReadPage />
-  },
-  {
-    path: "/settings",
-    element: <Settings />
+    element: <ReaderLayout />,
+    children: [
+      { index: true, element: <ReadPage /> }
+    ]
   },
 ]);
 
@@ -64,12 +55,10 @@ export default function App() {
   }, []);
 
   return(
-    <>
-      <ThemeProvider>
+    <ThemeProvider>
         <LibraryProvider>
           <RouterProvider router={router}/>
         </LibraryProvider>
       </ThemeProvider>
-    </>
   );
 }

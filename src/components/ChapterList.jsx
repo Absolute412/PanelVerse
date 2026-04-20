@@ -73,13 +73,12 @@ const ChapterList = ({
                                 <span 
                                     className="
                                     w-8 h-8 shrink-0 flex items-center justify-center rounded-full 
-                                    bg-black/5 dark:bg-white/10 text-black/70 
-                                    dark:text-gray-200 font-semibold text-sm"
+                                    bg-black/5 dark:bg-white/10 text-(--text-main)/70 font-semibold text-sm"
                                 >
                                     {chapterBadge}
                                 </span>
                                 <div className="min-w-0">
-                                    <span className="block text-gray-800 dark:text-gray-200 font-medium truncate">{chapterTitle}</span>
+                                    <span className="block text-(--text-main) font-medium truncate">{chapterTitle}</span>
                                     {progressLabel && (
                                         <span className="text-xs text-black/60 dark:text-white/60">{progressLabel}</span>
                                     )}

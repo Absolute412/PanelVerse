@@ -64,23 +64,23 @@ function LatestRelease() {
 
   if (loading) {
     return (
-      <section className="bg-(--main) pt-12 px-6 backdrop-blur-sm">
+      <section className="pt-12 px-6 backdrop-blur-sm">
         <div>
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3 w-full">
-              <span className="text-[11px] font-black tracking-[0.2em] uppercase text-black/70 dark:text-white/70">
+              <span className="text-[11px] font-black tracking-[0.2em] uppercase text-(--text-main)/70">
                 Latest Releases
               </span>
               <span className="h-px flex-1 bg-black/20 dark:bg-white/20" />
             </div>
             <Link to="/latest-release">
               <div className="flex items-center cursor-pointer group shrink-0">
-                <p className="text-sm font-semibold text-gray-600 group-hover:text-gray-800 dark:text-white/80 dark:group-hover:text-white">
+                <p className="text-sm font-semibold text-(--text-muted) group-hover:text-(--text-muted)">
                   See all
                 </p>
                 <Icon
                   icon="ic:round-navigate-next"
-                  className="text-gray-600 text-lg dark:text-white/80 group-hover:text-gray-800 dark:group-hover:text-white"
+                  className="text-(--text-main)/70 group-hover:text-(--text-muted)"
                 />
               </div>
             </Link>
@@ -101,23 +101,23 @@ function LatestRelease() {
   }
 
   return (
-    <section className="bg-(--main) pt-12 px-6 backdrop-blur-sm">
+    <section className="pt-12 px-6 backdrop-blur-sm">
       <div className="">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3 w-full">
-            <span className="text-[11px] font-black tracking-[0.2em] uppercase text-black/70 dark:text-white/70">
+            <span className="text-[11px] font-black tracking-[0.2em] uppercase text-(--text-main)/70">
               Latest Releases
             </span>
             <span className="h-px flex-1 bg-black/20 dark:bg-white/20" />
           </div>
           <Link to="/latest-release">
             <div className="flex items-center cursor-pointer group shrink-0">
-              <p className="text-sm font-semibold text-gray-600 group-hover:text-gray-800 dark:text-white/80 dark:group-hover:text-white">
+              <p className="text-sm font-semibold text-(--text-main)/70 group-hover:text-(--text-muted)">
                 See all
               </p>
               <Icon
                 icon="ic:round-navigate-next"
-                className="text-gray-600 text-lg dark:text-white/80 group-hover:text-gray-800 dark:group-hover:text-white"
+                className="text-(--text-main)/70 group-hover:text-(--text-muted)"
               />
             </div>
           </Link>
@@ -135,22 +135,22 @@ function LatestRelease() {
                 <img 
                   src={manga.imageThumb} 
                   alt={manga.title}
-                  className="w-18 h-24 object-cover rounded-lg shrink-0 ring-1 ring-white/30 dark:ring-white/10"
+                  className="w-18 h-24 object-cover rounded-lg shrink-0"
                 />
 
                 <div className="flex flex-col justify-between w-full">
-                  <h3 className="font-semibold line-clamp-2 text-gray-800 dark:text-white">
+                  <h3 className="font-semibold line-clamp-2 text-(--text-main)">
                     {manga.title}
                   </h3>
 
                   <div className="flex flex-row justify-between items-center">
-                    <p className="text-[12px] font-semibold text-gray-700 dark:text-gray-300 bg-black/5 dark:bg-white/10 px-2 py-1 rounded-full">
+                    <p className="text-[12px] font-semibold text-(--text-muted) bg-black/5 dark:bg-white/10 px-2 py-1 rounded-full">
                       {manga.latestChapter || manga.lastChapter
                         ? `Ch. ${manga.latestChapter || manga.lastChapter || "-"}`
                         : "Oneshot / Special"}
                     </p>
 
-                    <p className="text-[12px] font-semibold text-gray-600 dark:text-gray-300">
+                    <p className="text-[12px] font-semibold text-(--text-muted)">
                       {timeAgo(manga.latestPublishedAt || manga.updatedAt, now)}
                     </p>
                   </div>

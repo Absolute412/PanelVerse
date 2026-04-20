@@ -69,8 +69,7 @@ function Hero() {
     return (
         <section 
             className="
-            relative bg-(--main) min-h-[calc(58vh-4rem)] 
-            sm:min-h-[calc(80vh-4rem)] flex items-start sm:items-center overflow-hidden"
+            relative bg-(--main) flex items-start sm:items-center overflow-hidden"
         >
             {/* Background image */}
             <div className="absolute inset-0 overflow-hidden">
@@ -93,7 +92,7 @@ function Hero() {
                 />
             </div>
 
-            <div className="flex flex-col px-4 pt-2 sm:pt-0 gap-3 sm:gap-4 z-10 w-full">
+            <div className="flex flex-col px-4 mt-18 mb-10 gap-3 sm:gap-4 z-10 w-full">
                 <div className="flex items-center gap-3 mt-1 sm:mt-4">
                     <span className="text-[11px] font-black tracking-[0.2em] uppercase text-black/70 dark:text-white/70">
                         Popular Manga
@@ -113,11 +112,11 @@ function Hero() {
                                 alt={activeManga.title}
                                 className="
                                 w-full h-full sm:h-60 object-cover rounded-lg 
-                                opacity-95 shadow-2xl ring-1 ring-white/40 dark:ring-white/15"
+                                opacity-95 shadow-2xl"
                             />
                             <div 
                                 className="
-                                absolute -top-3 -left-3 bg-(--hero-action) text-gray-100
+                                absolute -top-3 -left-3 bg-(--action) text-gray-100
                                 text-[10px] font-black px-3 py-1 rounded-full shadow-lg"
                             >
                                 Trending
@@ -128,7 +127,7 @@ function Hero() {
                             <h1 
                                 className="
                                 text-base sm:text-3xl font-extrabold tracking-tight mb-2 
-                                text-gray-800 dark:text-white line-clamp-1"
+                                text-(--text-main) line-clamp-1"
                             >
                                 {activeManga.title}
                             </h1>
@@ -136,7 +135,7 @@ function Hero() {
                             <div 
                                 className="
                                 flex flex-wrap items-center gap-2 sm:gap-3 text-[10px] 
-                                sm:text-[12px] font-semibold text-black/70 dark:text-white/70 mb-3"
+                                sm:text-[12px] font-semibold text-(--text-main)/70 mb-3"
                             >
                                 {activeManga.author && (
                                     <span 
@@ -180,7 +179,7 @@ function Hero() {
                             <p 
                                 className="
                                 mt-1 flex-1 overflow-y-auto overflow-x-hidden wrap-break-word
-                                pr-1 sm:pr-2 text-sm sm:text-base text-gray-800/90 dark:text-gray-100/90
+                                pr-1 sm:pr-2 text-sm sm:text-base text-(--text-main)/80
                                 custom-scrollbar min-h-0 max-h-24 sm:max-h-40 md:max-h-none "
                             >
                                 {activeManga.description || "No description available."}
@@ -191,7 +190,7 @@ function Hero() {
                                     to={`/manga/${activeManga.id}`}
                                     className="
                                     flex-1 sm:flex-none text-center px-2 py-1 sm:px-4 sm:py-2 text-sm font-medium rounded-md transition
-                                    bg-(--hero-action) hover:bg-(--action-hover) text-white cursor-pointer"
+                                    bg-(--action) hover:bg-(--action-hover) text-white cursor-pointer"
                                 >
                                     Read Now
                                 </Link>
@@ -201,7 +200,7 @@ function Hero() {
                                     }
                                     className="
                                     flex-1 sm:flex-none min-w-0 justify-center px-2 py-1 sm:px-4 sm:py-2 text-sm rounded-md font-medium
-                                    bg-black/10 dark:bg-white/10 text-black dark:text-white hover:bg-black/20 dark:hover:bg-white/20
+                                    bg-black/10 dark:bg-white/10 text-(--text-main) hover:bg-black/20 dark:hover:bg-white/20
                                     flex items-center gap-2 cursor-pointer"
                                 >
                                     <Icon icon={isInLibrary ? "ic:round-bookmark-remove" : "ic:round-bookmark-add"} />
@@ -217,7 +216,7 @@ function Hero() {
                             {activeManga.genres?.slice(0, 6).map((genre, i) => (
                                 <span
                                     key={i}
-                                    className="bg-black/10 dark:bg-white/10 text-black dark:text-gray-200 text-[10px] font-black px-3 py-1 rounded-full"
+                                    className="bg-black/10 dark:bg-white/10 text-(--text-main)/70 text-[10px] font-black px-3 py-1 rounded-full"
                                 >
                                     {genre}
                                 </span>
@@ -226,15 +225,15 @@ function Hero() {
                     </div>
 
                     {/* Bottom bar */}
-                    <div className="hidden sm:flex items-center justify-between gap-3 mt-1 w-full opacity-90 text-black dark:text-white">
+                    <div className="hidden sm:flex items-center justify-between gap-3 mt-1 w-full opacity-90 text-(--text-main)">
                         <div className="flex items-center gap-2 shrink-0">
                             {mangas.map((_, i) => (
                                 <button
                                     key={i}
                                     onClick={() => setActiveIndex(i)}
-                                    className={`h-2.5 w-2.5 rounded-full transition-all ${
+                                    className={`h-2.5 w-2.5 rounded-full transition-all cursor-pointer ${
                                         i === activeIndex
-                                        ? "bg-(--hero-action) scale-110"
+                                        ? "bg-(--action) scale-110"
                                         : "bg-black/30 dark:bg-white/30 hover:bg-black/50 dark:hover:bg-white/50"
                                     }`}
                                     aria-label={`Go to slide ${i + 1}`}
@@ -261,7 +260,7 @@ function Hero() {
                         <Link
                             to={`/manga/${activeManga.id}`}
                             className="
-                            flex-1 text-center whitespace-nowrap px-4 py-2 text-sm bg-(--hero-action) 
+                            flex-1 text-center whitespace-nowrap px-4 py-2 text-sm bg-(--action) 
                             hover:bg-(--action-hover) text-gray-100 dark:text-white rounded-md font-semibold"
                         >
                             Read Now
@@ -287,7 +286,7 @@ function Hero() {
                                     onClick={() => setActiveIndex(i)}
                                     className={`h-2.5 w-2.5 rounded-full transition-all ${
                                         i === activeIndex
-                                            ? "bg-(--hero-action) scale-110"
+                                            ? "bg-(--action) scale-110"
                                             : "bg-black/30 dark:bg-white/30 hover:bg-black/50 dark:hover:bg-white/50"
                                     }`}
                                     aria-label={`Go to slide ${i + 1}`}

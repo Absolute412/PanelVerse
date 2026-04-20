@@ -1,12 +1,12 @@
 function HeroSkeleton() {
     return (
-        <section className="relative bg-main dark:bg-main-dark min-h-[calc(58vh-4rem)] sm:min-h-[calc(80vh-4rem)] flex items-start sm:items-center overflow-hidden">
+        <section className="relative flex items-start sm:items-center overflow-hidden">
             <div className="absolute inset-0">
                 <div className="w-full h-full bg-black/10 dark:bg-black/30 animate-pulse" />
                 <div className="absolute inset-0 bg-linear-to-tr from-black/25 via-black/10 to-transparent dark:from-black/60 dark:via-black/20 dark:to-transparent" />
             </div>
 
-            <div className="flex flex-col px-4 pt-2 sm:pt-0 gap-3 sm:gap-4 z-10 w-full">
+            <div className="flex flex-col px-4 mt-18 mb-10 gap-3 sm:gap-4 z-10 w-full">
                 <div className="flex items-center gap-3 mt-1 sm:mt-4">
                     <div className="h-3 w-28 bg-white/20 rounded-full animate-pulse" />
                     <span className="h-px flex-1 bg-white/10" />

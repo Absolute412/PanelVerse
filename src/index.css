@@ -1,14 +1,14 @@
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
-@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
 
 
 :root {
   --primary: #93C5FD;
   --main: #bbd9ff;
 
-  --component: #D6E6FF;
-  --component-hover: #C4DBFF;
+  --component: #E6F0FF;
+  --component-hover: #D4E6FF;
 
   --action: #3B82F6;
   --action-hover: #2563EB;
@@ -16,6 +16,9 @@
   --action-alt-hover: #3B82F6;
 
   --hero-action: #0EA5E9;
+
+  --text-main: #0F172A;
+  --text-muted: #64748B;
 }
 
 .dark {
@@ -27,10 +30,13 @@
     
   --action: #1B2550;
   --action-hover: #26336B;
-  --action-alt: #60A5FA;
-  --action-alt-hover: #3B82F6;
+  --action-alt: #26336B;       
+  --action-alt-hover: #32448F;
 
   --hero-action: #1B2550;
+  
+  --text-main: #E5E7EB; 
+  --text-muted: #94A3B8; 
 }
 
 /* Midnight Purple */
@@ -65,8 +71,46 @@
   --hero-action: #2A1F5E;
 }
 
+/* Neutral Theme (Refactored - Soft Monochrome) */
+.theme-neutral {
+  --primary: #f8fafc;
+  --main: #ffffff;
+
+  --component: #f1f5f9;
+  --component-hover: #e2e8f0;
+
+  --action: #334155;
+  --action-hover: #1e293b;
+  --action-alt: #64748b;
+  --action-alt-hover: #475569;
+
+  --hero-action: #1e293b;
+
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+}
+
+.theme-neutral.dark {
+  --primary: #020617;
+  --main: #020617;
+
+  --component: #0f172a;
+  --component-hover: #1e293b;
+
+  --action: #1e293b;
+  --action-hover: #334155;
+  --action-alt: #475569;
+  --action-alt-hover: #64748b;
+
+  --hero-action: #334155;
+
+  --text-main: #f1f5f9;
+  --text-muted: #94a3b8;
+}
+
 body {
-  font-family: "Plus Jarkata Sans", sans-serif;
+  background-color: var(--main);
+  font-family: "Plus Jakata Sans", sans-serif;
 }
 
 html.dark {

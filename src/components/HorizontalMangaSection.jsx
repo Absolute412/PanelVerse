@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Icon } from "@iconify/react";
 import HorizontalMangaStripSkeleton from "./HorizontalMangaStripSkeleton";
+import Card from "./Card";
 
 function HorizontalMangaSection({
   title,
@@ -57,35 +58,19 @@ function HorizontalMangaSection({
 
   // Success state
   return (
-    <section className="bg-(--main) pt-12 px-6 backdrop-blur-sm">
+    <section className="bg-(--main) px-6">
       <div>
         <Header title={title} link={link} />
 
         <div className="w-full overflow-x-auto overflow-y-hidden custom-scrollbar">
           <div className="flex flex-row gap-4 pb-2">
             {mangas.map((manga) => (
-              <Link to={`/manga/${manga.id}`} key={manga.id}>
-                <div className="
-                  flex-none w-34 sm:w-58 bg-white/35 dark:bg-black/30
-                  border border-white/20 dark:border-white/10
-                  rounded-2xl shadow-2xl hover:-translate-y-1 cursor-pointer
-                  overflow-hidden transition-transform duration-300 backdrop-blur-md
-                ">
-                  <div className="relative">
-                    <img
-                      src={manga.imageMedium}
-                      alt={manga.title}
-                      className="w-full h-42 sm:h-78 object-cover"
-                    />
-                    <div className="absolute inset-x-0 bottom-0 h-16 bg-linear-to-t from-black/60 via-black/10 to-transparent" />
-                  </div>
-
-                  <div className="p-2 sm:p-4">
-                    <h3 className="text-sm font-semibold text-gray-800 dark:text-white truncate">
-                      {manga.title}
-                    </h3>
-                  </div>
-                </div>
+              <Link 
+                to={`/manga/${manga.id}`} 
+                key={manga.id} 
+                className="flex-none w-34 sm:w-58"
+              >
+                <Card manga={manga} />
               </Link>
             ))}
           </div>
@@ -100,7 +85,7 @@ function Header({ title, link }) {
   return (
     <div className="flex items-center justify-between mb-6">
       <div className="flex items-center gap-3 w-full">
-        <span className="text-[11px] font-black tracking-[0.2em] uppercase text-black/70 dark:text-white/70">
+        <span className="text-[11px] font-black tracking-[0.2em] uppercase text-(--text-main)/70">
           {title}
         </span>
         <span className="h-px flex-1 bg-black/20 dark:bg-white/20" />
@@ -108,12 +93,12 @@ function Header({ title, link }) {
 
       <Link to={link}>
         <div className="flex items-center cursor-pointer group shrink-0">
-          <p className="text-sm font-semibold text-gray-600 group-hover:text-gray-800 dark:text-white/80 dark:group-hover:text-white">
+          <p className="text-sm font-semibold text-(--text-main)/70 hover:text-(--text-muted)">
             See all
           </p>
           <Icon
             icon="ic:round-navigate-next"
-            className="text-gray-600 text-lg dark:text-white/80 group-hover:text-gray-800 dark:group-hover:text-white"
+            className="text-(--text-main)/70 hover:text-(--text-muted)"
           />
         </div>
       </Link>
