@@ -123,7 +123,6 @@ const ReadPage = () => {
 
   const [showUi, setShowUi] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [pageMeta, setPageMeta] = useState({});
   const [swipeOffsetX, setSwipeOffsetX] = useState(0);
   const [isSwiping, setIsSwiping] = useState(false);
   const [isSwipeAnimating, setIsSwipeAnimating] = useState(false);
@@ -173,18 +172,9 @@ const ReadPage = () => {
   const handleImageLoad = useCallback((idx, e) => {
     if (!e?.target) return;
 
-    const img = e.target;
-
     setLoadedPages((prev) => ({
       ...prev,
       [idx]: true,
-    }));
-
-    setPageMeta((prev) => ({
-      ...prev,
-      [idx]: {
-        isWide: img.naturalWidth / img.naturalHeight > 1.2,
-      },
     }));
   }, []);
 
@@ -205,9 +195,13 @@ const ReadPage = () => {
     const nextIdx = activeIdx + delta;
 
     if (!scrollToPage(nextIdx)) {
-      goNextChapter();
+      if (direction === "rtl") {
+        goPrevChapter();
+      } else {
+        goNextChapter();
+      }
     }
-  }, [pages.length, direction, activeIdx, scrollToPage, goNextChapter]);
+  }, [pages.length, direction, activeIdx, scrollToPage, goNextChapter, goPrevChapter]);
 
   const goPrev = useCallback(() => {
     if (!pages.length) return;
@@ -216,15 +210,17 @@ const ReadPage = () => {
     const prevIdx = activeIdx + delta;
 
     if (!scrollToPage(prevIdx)) {
-      goPrevChapter();
+      if (direction === "rtl") {
+        goNextChapter();
+      } else {
+        goPrevChapter();
+      }
     }
-  }, [pages.length, direction, activeIdx, scrollToPage, goPrevChapter]);
+  }, [pages.length, direction, activeIdx, scrollToPage, goPrevChapter, goNextChapter]);
 
-  const currentIsWide = pageMeta[activeIdx]?.isWide;
 
   const containerClass = `
-    relative flex flex-col items-center justify-center py-6
-    ${readingMode === "single" && currentIsWide ? "min-h-[calc(100vh-7rem)]" : ""}
+    relative flex flex-col items-center justify-start py-2
     ${readingMode !== "single" ? "gap-4" : ""}
   `;
 
@@ -279,7 +275,7 @@ const ReadPage = () => {
   };
 
   const handleTouchMove = (e) => {
-    if (readingMode !== "single" || !isSwiping || isSwipeAnimating) return;
+    if (readingMode !== "single" || isSwipeAnimating) return;
 
     const touch = e.touches?.[0];
     if (!touch) return;
@@ -384,6 +380,8 @@ const ReadPage = () => {
     setSwipeOffsetX(0);
   };
 
+  const IMAGE_BASE = "h-full object-contain transition-opacity duration-150";
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (showUi) return;
@@ -417,7 +415,6 @@ const ReadPage = () => {
     const frameId = requestAnimationFrame(() => {
       setActiveIdx(0);
       setLoadedPages({});
-      setPageMeta({});
       setShowUi(false);
       pageRefs.current = [];
     });
@@ -492,7 +489,7 @@ const ReadPage = () => {
   return (
     <div 
       className={`
-        flex-1 min-h-screen flex flex-col pt-20
+        h-full w-full flex flex-col
         ${
           backgroundColors === "black" ? "bg-black" :
           backgroundColors === "gray" ? "bg-gray-300" :
@@ -603,6 +600,7 @@ const ReadPage = () => {
             {readingMode === "single" ? (() => {
               const prevIdx = getPreviewIndexForSwipe("right"); // swipe right = prev (physically)
               const nextIdx = getPreviewIndexForSwipe("left");  // swipe left = next (physically)
+              const showSwipeTrack = isSwiping || isSwipeAnimating || swipeOffsetX !== 0;
 
               const leftIdx = prevIdx;
               const rightIdx = nextIdx;
@@ -616,12 +614,13 @@ const ReadPage = () => {
                 }
 
                 const page = pages[idx];
-                const isWide = pageMeta[idx]?.isWide;
 
                 return (
                   <div
                     key={panelKey}
-                    className={`relative w-full shrink-0 flex justify-center items-center px-2 ${!loadedPages[idx] ? "min-h-[70vh]" : ""}`}
+                    className={`
+                      relative w-full shrink-0 flex justify-center items-center min-h-screen px-2
+                    `}
                   >
                     {!loadedPages[idx] && (
                       <div className="absolute inset-0 flex items-center justify-center">
@@ -633,10 +632,10 @@ const ReadPage = () => {
                       src={page.image}
                       alt={`Page ${idx + 1}`}
                       className={`
-                        block mx-auto rounded-lg shadow-lg
-                        ${displayMode === "original" && !isWide ? "w-auto max-w-full object-contain" : "w-full max-w-full object-contain"}
+                        block mx-auto rounded-lg shadow-lg object-contain max-w-full w-auto
+                        ${displayMode === "original" ? "w-auto max-h-none" : ""}
                         ${displayMode === "width" ? "w-full" : ""}
-                        ${displayMode === "screen" ? "max-h-screen object-contain" : ""}
+                        ${displayMode === "screen" ? "h-screen object-contain" : ""}
                         ${loadedPages[idx] ? "opacity-100" : "opacity-0"}
                       `}
                       loading="lazy"
@@ -648,24 +647,28 @@ const ReadPage = () => {
 
               return (
                 <div className="relative w-full overflow-hidden">
-                  <div className={`flex w-full ${swipeTransitionClass}`} style={trackStyle}>
-                    {renderPagePanel(leftIdx, "left")}
-                    {renderPagePanel(activeIdx, "center")}
-                    {renderPagePanel(rightIdx, "right")}
-                  </div>
+                  {showSwipeTrack ? (
+                    <div className={`flex items-start ${swipeTransitionClass}`} style={trackStyle}>
+                      {renderPagePanel(leftIdx, "left")}
+                      {renderPagePanel(activeIdx, "center")}
+                      {renderPagePanel(rightIdx, "right")}
+                    </div>
+                  ) : (
+                    <div className="flex items-start">
+                      {renderPagePanel(activeIdx, "center")}
+                    </div>
+                  )}
                 </div>
               );
             })() : pages.map((page, i) => {
               const isHidden =
                 readingMode === "single" && i !== activeIdx;
-              const isWide = pageMeta[i]?.isWide;
 
               return (
                 <div
                   key={i}
                   className={`
-                    relative w-full flex justify-center items-center px-2
-                    ${!loadedPages[i] ? "min-h-[70vh]" : ""}
+                    relative w-full flex justify-center items-start px-2
                     ${isHidden ? "hidden" : ""}
                   `}
                 >
@@ -685,29 +688,15 @@ const ReadPage = () => {
                     src={page.image}
                     alt={`Page ${i + 1}`}
                     className={`
-                      block mx-auto rounded-lg shadow-lg
-                      ${
-                        displayMode === "original" && !isWide
-                          ? "w-auto max-w-full object-contain"
-                          : "w-full max-w-full object-contain"
-                      }
-                      ${
-                        displayMode === "width"
-                          ? "w-full"
-                          : ""
-                      }
-                      ${
-                        displayMode === "screen"
-                          ? "max-h-screen object-contain"
-                          : ""
-                      }
+                      block mx-auto rounded-lg shadow-lg object-contain max-w-full
+                      ${displayMode === "original" ? "w-auto max-h-none" : ""}
+                      ${displayMode === "width" ? "w-full" : ""}
+                      ${displayMode === "screen" ? "w-auto max-w-full" : ""}
+                      ${displayMode !== "original" && displayMode !== "width" && displayMode !== "screen" ? "w-full max-w-full" : ""}
                       ${loadedPages[i] ? "opacity-100" : "opacity-0"}
                     `}
                     loading="lazy"
-                    onLoad={(e) =>
-                      requestAnimationFrame(() =>
-                        handleImageLoad(i, e)
-                      )
+                    onLoad={(e) => requestAnimationFrame(() => handleImageLoad(i, e))
                     }
                   />
                 </div>
