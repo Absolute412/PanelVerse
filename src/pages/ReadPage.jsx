@@ -124,7 +124,14 @@ const ReadPage = () => {
   const [showUi, setShowUi] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [pageMeta, setPageMeta] = useState({});
+  const [swipeOffsetX, setSwipeOffsetX] = useState(0);
+  const [isSwiping, setIsSwiping] = useState(false);
+  const [isSwipeAnimating, setIsSwipeAnimating] = useState(false);
   const pageRefs = useRef([]);
+  const swipeStartRef = useRef({ x: 0, y: 0, time: 0 });
+  const swipeMetaRef = useRef({ isHorizontal: false });
+  const swipeResetTimeoutRef = useRef(null);
+  const readerViewportRef = useRef(null);
 
   const preloadedRef = useRef(new Set());
 
@@ -221,41 +228,160 @@ const ReadPage = () => {
     ${readingMode !== "single" ? "gap-4" : ""}
   `;
 
-  const touchStart = useRef({ x: 0, y: 0 });
-  const touchEnd = useRef({ x: 0, y: 0 });
+  const getSwipeNav = useCallback((swipeDirection) => {
+    if (swipeDirection === "left") {
+      return direction === "rtl" ? "next" : "next";
+    }
+    return direction === "rtl" ? "prev" : "prev";
+  }, [direction]);
+
+  const getPageDeltaForNav = useCallback((nav) => {
+    if (nav === "next") return direction === "rtl" ? -1 : 1;
+    return direction === "rtl" ? 1 : -1;
+  }, [direction]);
+
+  const getPreviewIndexForSwipe = useCallback((swipeDirection) => {
+    const nav = getSwipeNav(swipeDirection);
+    const idx = activeIdx + getPageDeltaForNav(nav);
+    return idx >= 0 && idx < pages.length ? idx : null;
+  }, [activeIdx, pages.length, getSwipeNav, getPageDeltaForNav]);
+
+  const animateSwipeAndNavigate = useCallback((nav, offsetTarget) => {
+    setIsSwipeAnimating(true);
+    setSwipeOffsetX(offsetTarget);
+
+    if (swipeResetTimeoutRef.current) {
+      clearTimeout(swipeResetTimeoutRef.current);
+    }
+
+    swipeResetTimeoutRef.current = setTimeout(() => {
+      if (nav === "next") goNext();
+      else goPrev();
+
+      setSwipeOffsetX(0);
+      setIsSwiping(false);
+      setIsSwipeAnimating(false);
+    }, 180);
+  }, [goNext, goPrev]);
 
   const handleTouchStart = (e) => {
-    const touch = e.touches[0];
-    touchStart.current = {
+    if (showUi || isSwipeAnimating) return;
+    const touch = e.touches?.[0];
+    if (!touch) return;
+
+    swipeStartRef.current = {
       x: touch.clientX,
       y: touch.clientY,
+      time: Date.now(),
     };
+    swipeMetaRef.current = { isHorizontal: false };
+    setIsSwiping(false);
+  };
+
+  const handleTouchMove = (e) => {
+    if (readingMode !== "single" || !isSwiping || isSwipeAnimating) return;
+
+    const touch = e.touches?.[0];
+    if (!touch) return;
+
+    const dx = touch.clientX - swipeStartRef.current.x;
+    const dy = touch.clientY - swipeStartRef.current.y;
+
+    if (!swipeMetaRef.current.isHorizontal) {
+      if (Math.abs(dx) <= Math.abs(dy)) return;
+      swipeMetaRef.current.isHorizontal = true;
+      setIsSwiping(true);
+    }
+
+    e.preventDefault();
+
+    const leftPreviewIdx = getPreviewIndexForSwipe("left");
+    const rightPreviewIdx = getPreviewIndexForSwipe("right");
+    const hasLeftPreview = leftPreviewIdx !== null;
+    const hasRightPreview = rightPreviewIdx !== null;
+
+    let boundedDx = dx;
+    if (dx < 0 && !hasLeftPreview) boundedDx *= 0.25;
+    if (dx > 0 && !hasRightPreview) boundedDx *= 0.25;
+
+    setSwipeOffsetX(boundedDx);
   };
 
   const handleTouchEnd = (e) => {
-    const touch = e.changedTouches[0];
-    touchEnd.current = {
-      x: touch.clientX,
-      y: touch.clientY,
-    };
+    if (showUi || isSwipeAnimating) return;
+    const touch = e.changedTouches?.[0];
+    if (!touch) return;
 
-    const dx = touchEnd.current.x - touchStart.current.x;
-    const dy = touchEnd.current.y - touchStart.current.y;
+    const dx = touch.clientX - swipeStartRef.current.x;
+    const dy = touch.clientY - swipeStartRef.current.y;
+    const dt = Math.max(1, Date.now() - swipeStartRef.current.time);
+    const velocityX = dx / dt;
 
-    // Ignore vertical scrolls
-    if (Math.abs(dy) > Math.abs(dx)) return;
+    if (readingMode !== "single") {
+      if (Math.abs(dy) > Math.abs(dx) || Math.abs(dx) < 50) {
+        setIsSwiping(false);
+        setSwipeOffsetX(0);
+        return;
+      }
 
-    const threshold = 50; // swipe sensitivity
-
-    if (Math.abs(dx) < threshold) return;
-
-    if (dx < 0) {
-      // swipe left
-      direction === "rtl" ? goPrev() : goNext();
-    } else {
-      // swipe right
-      direction === "rtl" ? goNext() : goPrev();
+      if (dx < 0) {
+        direction === "rtl" ? goPrev() : goNext();
+      } else {
+        direction === "rtl" ? goNext() : goPrev();
+      }
+      setIsSwiping(false);
+      setSwipeOffsetX(0);
+      return;
     }
+
+    const width = readerViewportRef.current?.clientWidth || window.innerWidth || 1;
+    const threshold = Math.min(120, Math.max(40, width * 0.22));
+    const fastSwipe = Math.abs(velocityX) > 0.45;
+
+    // Fallback check on release so swipe still works on devices that emit sparse touchmove events.
+    if (Math.abs(dx) <= Math.abs(dy)) {
+      setIsSwiping(false);
+      setSwipeOffsetX(0);
+      return;
+    }
+
+    const swipeDirection = dx < 0 ? "left" : "right";
+    const nav = getSwipeNav(swipeDirection);
+    const previewIdx = getPreviewIndexForSwipe(swipeDirection);
+    const canTurnPage = previewIdx !== null;
+
+    if (canTurnPage && (Math.abs(dx) >= threshold || fastSwipe)) {
+      const targetOffset = swipeDirection === "left" ? -width : width;
+      animateSwipeAndNavigate(nav, targetOffset);
+      return;
+    }
+
+    setIsSwipeAnimating(true);
+    setSwipeOffsetX(0);
+    if (swipeResetTimeoutRef.current) {
+      clearTimeout(swipeResetTimeoutRef.current);
+    }
+    swipeResetTimeoutRef.current = setTimeout(() => {
+      setIsSwipeAnimating(false);
+      setIsSwiping(false);
+    }, 160);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (swipeResetTimeoutRef.current) {
+        clearTimeout(swipeResetTimeoutRef.current);
+      }
+    }
+  }, []);
+
+  const handleTouchCancel = () => {
+    if (swipeResetTimeoutRef.current) {
+      clearTimeout(swipeResetTimeoutRef.current);
+    }
+    setIsSwiping(false);
+    setIsSwipeAnimating(false);
+    setSwipeOffsetX(0);
   };
 
   useEffect(() => {
@@ -403,15 +529,21 @@ const ReadPage = () => {
         /* MAIN READER */
         <div 
           className="flex-1 relative"
+          ref={readerViewportRef}
           onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
+          onTouchCancel={handleTouchCancel}
+          style={{ touchAction: readingMode === "single" ? "none" : "pan-y" }}
         >
           <div className={containerClass}>
             {/* TAP ZONES */}
             <div className="fixed inset-x-0 top-0 bottom-12 z-10 flex pointer-events-none">
               <div
                 className="w-1/3 h-full pointer-events-auto"
-                onClick={() => !showUi && goPrev()}
+                onClick={() =>
+                  !showUi && !isSwipeAnimating && goPrev()
+                }
               />
               <div
                 className="w-1/3 h-full pointer-events-auto"
@@ -419,7 +551,9 @@ const ReadPage = () => {
               />
               <div
                 className="w-1/3 h-full pointer-events-auto"
-                onClick={() => !showUi && goNext()}
+                onClick={() =>
+                  !showUi && !isSwipeAnimating && goNext()
+                }
               />
             </div>
 
@@ -466,7 +600,62 @@ const ReadPage = () => {
               setProgressBarPosition={setProgressBarPosition}
             />
 
-            {pages.map((page, i) => {
+            {readingMode === "single" ? (() => {
+              const prevIdx = getPreviewIndexForSwipe("right"); // swipe right = prev (physically)
+              const nextIdx = getPreviewIndexForSwipe("left");  // swipe left = next (physically)
+
+              const leftIdx = prevIdx;
+              const rightIdx = nextIdx;
+              const swipeTransitionClass = isSwipeAnimating ? "transition-transform duration-180 ease-out" : "";
+              const trackStyle = {
+                transform: `translate3d(calc(-100% + ${swipeOffsetX}px), 0, 0)`,
+              };
+              const renderPagePanel = (idx, panelKey) => {
+                if (idx === null || !pages[idx]) {
+                  return <div key={panelKey} className="w-full shrink-0" />;
+                }
+
+                const page = pages[idx];
+                const isWide = pageMeta[idx]?.isWide;
+
+                return (
+                  <div
+                    key={panelKey}
+                    className={`relative w-full shrink-0 flex justify-center items-center px-2 ${!loadedPages[idx] ? "min-h-[70vh]" : ""}`}
+                  >
+                    {!loadedPages[idx] && (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-10 h-10 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                      </div>
+                    )}
+
+                    <img
+                      src={page.image}
+                      alt={`Page ${idx + 1}`}
+                      className={`
+                        block mx-auto rounded-lg shadow-lg
+                        ${displayMode === "original" && !isWide ? "w-auto max-w-full object-contain" : "w-full max-w-full object-contain"}
+                        ${displayMode === "width" ? "w-full" : ""}
+                        ${displayMode === "screen" ? "max-h-screen object-contain" : ""}
+                        ${loadedPages[idx] ? "opacity-100" : "opacity-0"}
+                      `}
+                      loading="lazy"
+                      onLoad={(e) => requestAnimationFrame(() => handleImageLoad(idx, e))}
+                    />
+                  </div>
+                );
+              };
+
+              return (
+                <div className="relative w-full overflow-hidden">
+                  <div className={`flex w-full ${swipeTransitionClass}`} style={trackStyle}>
+                    {renderPagePanel(leftIdx, "left")}
+                    {renderPagePanel(activeIdx, "center")}
+                    {renderPagePanel(rightIdx, "right")}
+                  </div>
+                </div>
+              );
+            })() : pages.map((page, i) => {
               const isHidden =
                 readingMode === "single" && i !== activeIdx;
               const isWide = pageMeta[i]?.isWide;
