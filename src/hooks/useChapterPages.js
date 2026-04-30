@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getChapterPages } from "../api/manga";
 
-export  function useChapterPages(chapterId) {
+export  function useChapterPages(chapterId, source) {
     const [pages, setPages] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -14,9 +14,10 @@ export  function useChapterPages(chapterId) {
                 if (isMounted) {
                     setLoading(true);
                     setError(null);
+                    setPages([]);
                 }
 
-                const data = await getChapterPages(chapterId);
+                const data = await getChapterPages(chapterId, source);
 
                 if (isMounted) {
                     setPages(data);
@@ -32,14 +33,18 @@ export  function useChapterPages(chapterId) {
             }
         };
 
-        if (chapterId) {
+        // Do not fetch pages until both chapter ID and resolved source are available.
+        if (chapterId && source) {
             fetchPages();
+        } else if (isMounted) {
+            setLoading(false);
+            setPages([]);
         }
 
         return () => {
             isMounted = false;
         };
-    }, [chapterId]);
+    }, [chapterId, source]);
 
     return { pages, loading, error};
 }

@@ -44,12 +44,12 @@ const ScrollToTopBtn = () => {
             >
                 <div 
                     className="
-                    flex items-center gap-1 p-2 rounded-full bg-white/70 hover:bg-white 
-                    dark:bg-(--component) dark:hover:bg-(--component-hover) backdrop-blur-2xl shadow-md transition"
+                    flex items-center gap-1 p-2 rounded-full bg-(--component)/70 hover:bg-(--component)
+                    backdrop-blur-2xl shadow-md transition"
                 >
                     <Icon 
                         icon="mingcute:up-fill" 
-                        className="text-gray-600 dark:text-gray-200 text-3xl cursor-pointer hover:text-gray-800 dark:hover:text-white" 
+                        className="text-(--text-main) text-3xl cursor-pointer" 
                     />
                 </div>
             </button>

@@ -51,6 +51,15 @@ function ContinueReading() {
                 <Link
                   to={`/read/${item.mangaId}/${item.currentChapterId}`}
                   key={`${item.mangaId}-${item.currentChapterId}`}
+                  // Pass source + manga metadata so reader sidebar can render title immediately.
+                  state={{
+                    source: item.source || undefined,
+                    manga: {
+                      title: item.title,
+                      imageThumb: item.imageThumb || "/placeholder.jpg",
+                      imageMedium: item.imageMedium || item.imageThumb || "/placeholder.jpg",
+                    },
+                  }}
                 >
                   <div 
                     className="

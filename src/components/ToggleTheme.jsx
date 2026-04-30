@@ -12,7 +12,7 @@ const ToggleTheme = ({ compact = false }) => {
                 className="
                     flex items-center justify-center w-10 h-10 rounded-lg
                     bg-(--component) border border-white/20 dark:border-white/10
-                    transition-all duration-200 hover:scale-105 active:scale-95"
+                    transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer"
                 aria-label={mode === "dark" ? "Switch to light mode" : "Switch to dark mode"}
             >
                 <Icon

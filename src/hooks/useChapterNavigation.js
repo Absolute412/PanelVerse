@@ -6,6 +6,7 @@ export function useChapterNavigation({
     mangaId,
     chapterId,
     chapters = [],
+    routeState,
 }) {
     const navigate = useNavigate();
 
@@ -32,8 +33,10 @@ export function useChapterNavigation({
     const goToChapter = useCallback((chapter) => {
         if (!chapter) return;
 
-        navigate(`/read/${mangaId}/${chapter.id}`);
-    }, [navigate, mangaId]);
+        navigate(`/read/${mangaId}/${chapter.id}`, {
+            state: routeState,
+        });
+    }, [navigate, mangaId, routeState]);
 
     const goNextChapter = useCallback(() => {
         if (!nextChapter) return;

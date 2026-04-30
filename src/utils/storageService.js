@@ -12,6 +12,8 @@ const EMPTY_PROGRESS = {
   schemaVersion: STORAGE_SCHEMA_VERSION,
   currentChapterId: null,
   chapterId: null, // Legacy compatibility for older reads.
+  // Persist last known source to resolve reader requests opened from Continue Reading.
+  source: null,
   // Metadata fallback for Continue Reading when manga is not in Library.
   title: null,
   imageThumb: "/placeholder.jpg",
@@ -110,6 +112,10 @@ const normalizeProgress = (rawProgress) => {
     schemaVersion: STORAGE_SCHEMA_VERSION,
     currentChapterId,
     chapterId: currentChapterId,
+    // Keep source normalized so older/malformed storage does not break routing.
+    source: typeof rawProgress.source === "string" && rawProgress.source.trim()
+      ? rawProgress.source.trim()
+      : null,
     title,
     imageThumb,
     imageMedium,
@@ -274,6 +280,8 @@ export const getContinueReadingItems = (limit = 10) => {
         imageThumb: libraryItem?.imageThumb || progress.imageThumb || "/placeholder.jpg",
         imageMedium: libraryItem?.imageMedium || libraryItem?.imageThumb || progress.imageMedium || progress.imageThumb || "/placeholder.jpg",
         currentChapterId,
+        // Expose stored source to frontend navigation state.
+        source: progress.source || null,
         lastPage: Number.isInteger(lastPage) && lastPage >= 0 ? lastPage : 0,
         totalPages: Number.isInteger(totalPages) && totalPages >= 0 ? totalPages : 0,
         updatedAt: Number.isFinite(updatedAt) ? updatedAt : 0,

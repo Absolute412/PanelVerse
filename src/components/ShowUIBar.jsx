@@ -2,6 +2,7 @@ import { Icon } from "@iconify/react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ReaderSettingsModal from "./ReaderSettingsModal";
+import { getChapterLabel } from "../utils/formatChapter";
 
 function ShowUIBar ({ 
     showUI, 
@@ -13,6 +14,7 @@ function ShowUIBar ({
     chapterTitle, 
     chapterLabel,
     chapters,
+    chapterListDisplay,
     mangaId,
     mangaMeta,
     currentChapterId,
@@ -30,6 +32,14 @@ function ShowUIBar ({
     const [openChapterList, setOpenChapterList] = useState(false);
 
     const navigate = useNavigate();
+
+    const handleBack = () => {
+        navigate(`/manga/${mangaId}`)
+    };
+
+    const chapterItems = Array.isArray(chapterListDisplay) && chapterListDisplay.length > 0
+        ? chapterListDisplay
+        : chapters;
 
     const readingModeLabels = {
         single: "Single Page",
@@ -60,16 +70,16 @@ function ShowUIBar ({
             >
                 {/* Header */}
                 <div className="p-4 flex items-center justify-between border-b border-black/10 dark:border-white/10">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center">
                         <button
-                            onClick={() => navigate("/library")}
+                            onClick={handleBack}
                             className="p-2 rounded-lg bg-(--component) hover:bg-(--component-hover) transition cursor-pointer"
                         >
                             <Icon icon="mdi:arrow-back" />
                         </button>
                     </div>
-                    <div className="leading-tight text-center">
-                        <h3 className="font-bold text-2xl text-(--text-main)">{chapterTitle}</h3>
+                    <div className="leading-tight flex flex-col items-center text-center">
+                        <h3 className="font-bold text-lg text-(--text-main)">{chapterTitle}</h3>
 
                         {chapterLabel && (
                             <p className="text-xs text-(--text-muted) font-semibold truncate max-w-45">
@@ -200,7 +210,7 @@ function ShowUIBar ({
                                         absolute left-0 right-0 mt-2 max-h-60 overflow-y-auto rounded-lg 
                                         bg-(--component) border border-white/10 custom-scrollbar z-50"
                                     >
-                                        {chapters.map((ch, idx) => {
+                                        {chapterItems.map((ch, idx) => {
                                             const isActive = ch.id === currentChapterId;
 
                                             return (
@@ -216,7 +226,7 @@ function ShowUIBar ({
                                                         ${isActive ? "bg-(--main)" : ""}
                                                     `}
                                                 >
-                                                    {ch.title || `Chapter ${idx + 1}`}
+                                                    {getChapterLabel(ch) || `Chapter ${idx + 1}`}
                                                 </button>
                                             );
                                         })}
@@ -241,7 +251,7 @@ function ShowUIBar ({
                     </div>
                 </div>
 
-                <div className="px-4">
+                <div className="px-2">
                     <div className="h-px bg-black/10 dark:bg-white/10 my-1 mx-4"/>
                 </div>
 
@@ -277,6 +287,7 @@ function ShowUIBar ({
                         flex items-center gap-2 w-full p-3 rounded-lg bg-(--component) 
                         hover:bg-(--component-hover) text-left text-(--text-main) cursor-pointer"
                     >
+                        {/* Icon name switches with display mode; keep props standard to avoid invalid DOM attributes. */}
                         <Icon
                             icon={
                                 displayMode === "original" 
@@ -285,7 +296,6 @@ function ShowUIBar ({
                                 ? "ix:width"
                                 : "ix:height" 
                             } 
-                            ix:width
                             className="text-xl shrink-0" 
                          />
                         <span>{displayModeLabels[displayMode]}</span>

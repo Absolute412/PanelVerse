@@ -7,17 +7,104 @@ import { useReaderSettings } from "../hooks/useReaderSettings";
 import { useChapterPages } from "../hooks/useChapterPages";
 import { useChapters } from "../hooks/useChapters";
 import { useChapterNavigation } from "../hooks/useChapterNavigation";
+import { getMangaProgress } from "../utils/storageService";
+
+const EMPTY_CHAPTERS = [];
+
+const getChapterNumericValue = (chapter) => {
+  const fromNumber = parseFloat(chapter?.number);
+  if (!Number.isNaN(fromNumber)) return fromNumber;
+
+  const title = String(chapter?.title || "");
+  const match = title.match(/chapter\s*([\d.]+)/i) || title.match(/(\d+(?:\.\d+)?)/);
+  if (!match) return Number.NEGATIVE_INFINITY;
+
+  const fromTitle = parseFloat(match[1]);
+  return Number.isNaN(fromTitle) ? Number.NEGATIVE_INFINITY : fromTitle;
+};
+
+const isLikelyMangaDexChapterId = (value) => {
+  const normalized = String(value || "").trim();
+  // MangaDex chapter IDs are UUIDs.
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(normalized);
+};
+
+const isLikelyUlid = (value) => {
+  const normalized = String(value || "").trim();
+  // WeebCentral chapter IDs in our flow commonly look like ULIDs (26 Crockford Base32 chars).
+  return /^[0-9A-HJKMNP-TV-Z]{26}$/.test(normalized);
+};
+
+const sanitizeSourceForChapterId = (source, id) => {
+  if (!source) return null;
+  // Ignore stale route/storage source if ID shape does not match MangaDex.
+  if (source === "mangadex" && !isLikelyMangaDexChapterId(id)) return null;
+  return source;
+};
+
+const inferSourceFromChapterId = (id) => {
+  // Last-resort inference when chapter metadata is unavailable (e.g. Continue Reading direct open).
+  if (isLikelyMangaDexChapterId(id)) return "mangadex";
+  if (isLikelyUlid(id)) return "weebcentral";
+  return null;
+};
 
 const ReadPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const locationState = location.state;
 
   const { mangaId, chapterId } = useParams();
-  const { pages, loading, error } = useChapterPages(chapterId);
-  const { chapters } = useChapters(
-    mangaId,
-    location.state?.chapters || []
+
+  // Keep fallback chapters stable without useMemo to avoid React Compiler dependency warnings.
+  const initialRouteChapters = Array.isArray(locationState?.chapters)
+    ? locationState.chapters
+    : EMPTY_CHAPTERS;
+
+  const { chapters, loading: chaptersLoading } = useChapters(mangaId, initialRouteChapters);
+
+  const currentChapter = chapters.find(c => c.id === chapterId);
+
+  const routeChapterSource = sanitizeSourceForChapterId(
+    initialRouteChapters.find(c => c.id === chapterId)?.source || locationState?.source || null,
+    chapterId
   );
+  // Priority: live chapter metadata > route hint > ID-shape inference after chapter list load.
+  const source =
+    currentChapter?.source ||
+    routeChapterSource ||
+    (!chaptersLoading ? inferSourceFromChapterId(chapterId) : null);
+  const storedProgressMeta = getMangaProgress(mangaId);
+  const mangaMeta = locationState?.manga || {
+    title: storedProgressMeta?.title || null,
+    imageThumb: storedProgressMeta?.imageThumb || "/placeholder.jpg",
+    imageMedium:
+      storedProgressMeta?.imageMedium ||
+      storedProgressMeta?.imageThumb ||
+      "/placeholder.jpg",
+  };
+  const readerRouteState = {
+    chapters,
+    manga: mangaMeta,
+  };
+
+  const { pages, loading, error } = useChapterPages(chapterId, source);
+  // Stay in loading UI until we either resolved source or failed explicitly.
+  const isReaderLoading = loading || (!source && chaptersLoading);
+  const sourceResolveError = !source && !chaptersLoading
+    ? "Unable to resolve chapter source for this saved chapter."
+    : null;
+  const chapterDropdownList = [...chapters].sort((a, b) => {
+    const na = getChapterNumericValue(a);
+    const nb = getChapterNumericValue(b);
+
+    if (na === nb) {
+      return String(b?.title || "").localeCompare(String(a?.title || ""));
+    }
+
+    return nb - na;
+  });
+
   const {
     prevChapter,
     nextChapter,
@@ -28,6 +115,7 @@ const ReadPage = () => {
     mangaId,
     chapterId,
     chapters,
+    routeState: readerRouteState,
   });
 
   const [activeIdx, setActiveIdx] = useState(0);
@@ -37,8 +125,6 @@ const ReadPage = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [pageMeta, setPageMeta] = useState({});
   const pageRefs = useRef([]);
-
-  const mangaMeta = location.state?.manga || null;
 
   const preloadedRef = useRef(new Set());
 
@@ -98,6 +184,7 @@ const ReadPage = () => {
   useMangaProgress({
     mangaId,
     chapterId,
+    source,
     pages,
     activeIdx,
     mangaMeta,
@@ -125,6 +212,51 @@ const ReadPage = () => {
       goPrevChapter();
     }
   }, [pages.length, direction, activeIdx, scrollToPage, goPrevChapter]);
+
+  const currentIsWide = pageMeta[activeIdx]?.isWide;
+
+  const containerClass = `
+    relative flex flex-col items-center justify-center py-6
+    ${readingMode === "single" && currentIsWide ? "min-h-[calc(100vh-7rem)]" : ""}
+    ${readingMode !== "single" ? "gap-4" : ""}
+  `;
+
+  const touchStart = useRef({ x: 0, y: 0 });
+  const touchEnd = useRef({ x: 0, y: 0 });
+
+  const handleTouchStart = (e) => {
+    const touch = e.touches[0];
+    touchStart.current = {
+      x: touch.clientX,
+      y: touch.clientY,
+    };
+  };
+
+  const handleTouchEnd = (e) => {
+    const touch = e.changedTouches[0];
+    touchEnd.current = {
+      x: touch.clientX,
+      y: touch.clientY,
+    };
+
+    const dx = touchEnd.current.x - touchStart.current.x;
+    const dy = touchEnd.current.y - touchStart.current.y;
+
+    // Ignore vertical scrolls
+    if (Math.abs(dy) > Math.abs(dx)) return;
+
+    const threshold = 50; // swipe sensitivity
+
+    if (Math.abs(dx) < threshold) return;
+
+    if (dx < 0) {
+      // swipe left
+      direction === "rtl" ? goPrev() : goNext();
+    } else {
+      // swipe right
+      direction === "rtl" ? goNext() : goPrev();
+    }
+  };
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -244,7 +376,7 @@ const ReadPage = () => {
       `}
     >
       {/* LOADING STATE (FULL CENTER FIX) */}
-      {loading ? (
+      {isReaderLoading ? (
         <div className="flex-1 flex items-center justify-center">
           <div className="flex flex-col items-center justify-center gap-3">
             <div className="w-10 h-10 border-4 border-(--action-hover) border-t-transparent rounded-full animate-spin" />
@@ -253,11 +385,11 @@ const ReadPage = () => {
             </p>
           </div>
         </div>
-      ) : error ? (
+      ) : (error || sourceResolveError) ? (
         /* ERROR STATE */
         <div className="flex-1 flex items-center justify-center text-center">
           <div className="flex flex-col gap-3">
-            <p className="text-red-500 dark:text-red-600">{error}</p>
+            <p className="text-red-500 dark:text-red-600">{error || sourceResolveError}</p>
 
             <button
               onClick={handleBack}
@@ -269,16 +401,12 @@ const ReadPage = () => {
         </div>
       ) : (
         /* MAIN READER */
-        <div className="flex-1 relative">
-          <div
-            className={`
-              relative py-6
-              ${readingMode === "single"
-                ? "flex justify-center items-center"
-                : "flex flex-col items-center gap-4"
-              }
-            `}
-          >
+        <div 
+          className="flex-1 relative"
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
+          <div className={containerClass}>
             {/* TAP ZONES */}
             <div className="fixed inset-x-0 top-0 bottom-12 z-10 flex pointer-events-none">
               <div
@@ -305,6 +433,7 @@ const ReadPage = () => {
               chapterTitle={mangaMeta?.title || "Unknown Manga"}
               chapterLabel={chapterLabel}
               chapters={chapters}
+              chapterListDisplay={chapterDropdownList}
               mangaMeta={mangaMeta}
               mangaId={mangaId}
               currentChapterId={chapterId}

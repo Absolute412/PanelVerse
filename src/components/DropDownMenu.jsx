@@ -58,6 +58,7 @@ function DropDownMenu () {
                     <div className="flex flex-col gap-2">
                         <Link 
                             to="/settings" 
+                            onClick={() => setOpen(false)}
                             className="
                             flex items-center justify-start gap-3 w-full px-3 py-2 text-sm font-medium 
                             text-(--text-main)/90 hover:bg-(--component) rounded-lg transition-colors"
@@ -69,6 +70,7 @@ function DropDownMenu () {
                         </Link>
                         <Link 
                             to="/about" 
+                            onClick={() => setOpen(false)}
                             className="
                             flex items-center justify-start gap-3 w-full px-3 py-2 text-sm font-medium 
                             text-(--text-main)/90 hover:bg-(--component) rounded-lg transition-colors"

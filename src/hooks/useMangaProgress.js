@@ -4,6 +4,7 @@ import { getMangaProgress, setMangaProgress } from "../utils/storageService";
 export function useMangaProgress ({
     mangaId,
     chapterId,
+    source,
     pages,
     activeIdx,
     mangaMeta,
@@ -77,6 +78,8 @@ export function useMangaProgress ({
             ...parsed,
             currentChapterId: chapterId,
             chapterId,
+            // Persist source so Continue Reading can open with the right backend source next time.
+            source: source || parsed?.source || null,
             title: existingTitle || (
                 typeof mangaMeta?.title === "string"
                     ? mangaMeta.title.trim()
@@ -92,5 +95,5 @@ export function useMangaProgress ({
             updatedAt,
             chapters: chaptersProgress,
         });
-    }, [didRestorePage, mangaId, chapterId, activeIdx, pages.length, mangaMeta]);
+    }, [didRestorePage, mangaId, chapterId, source, activeIdx, pages.length, mangaMeta]);
 }

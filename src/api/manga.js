@@ -42,8 +42,8 @@ export const getAllChapters = async (mangaId) => {
   return fetchJson(url);
 };
 
-export const getChapterPages = async (chapterId) => {
+export const getChapterPages = async (chapterId, source = "mangadex") => {
   // Page image list for reader view.
-  const url = `${API_BASE}/chapter/${chapterId}/pages`;
+  const url = `${API_BASE}/chapter/${chapterId}/pages?source=${source}`;
   return fetchJson(url);
 };

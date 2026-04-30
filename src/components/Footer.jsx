@@ -2,6 +2,11 @@ import { Link } from "react-router-dom";
 import { PanelVerseLogo } from "./PanelVerseLogo";
 
 function Footer() {
+    const footerNav = [
+        { name: "Home", path: "/" },
+        { name: "About", path: "/about" },
+        { name: "Contact", path: "#" },
+    ];
     
     return(
         <footer className="relative mt-8">
@@ -17,10 +22,16 @@ function Footer() {
                     </span>
                 </div>
 
-                <ul className="flex flex-wrap gap-6 text-sm font-semibold">
-                    <li><Link to="/about" className="text-(--text-main) hover:text-(--text-muted)">About</Link></li>
-                    <li><Link to="#" className="text-(--text-main) hover:text-(--text-muted)">Contact</Link></li>
-                    <li><Link to="#" className="text-(--text-main) hover:text-(--text-muted)">Terms</Link></li>
+                <ul className="flex flex-wrap gap-6 text-sm">
+                    {footerNav.map((item) => (
+                        <Link
+                            key={item.path} 
+                            to={item.path}
+                            className="text-(--text-main) hover:text-(--text-muted)"
+                        >
+                            {item.name}
+                        </Link>
+                    ))}
                 </ul>
 
                 <div className="text-sm text-(--text-main)/70">

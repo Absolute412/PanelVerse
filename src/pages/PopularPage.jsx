@@ -33,9 +33,9 @@ function PopularPage() {
             <MangaGrid mangas={mangas} loading={initialLoading} />
 
             {loadingMore && (
-                <p className="text-center mt-6">
-                    Loading more...
-                </p>
+                <div className="flex-1 flex items-center justify-center mt-6">
+                    <div className="w-10 h-10 border-4 border-(--action-hover) border-t-transparent animate-spin rounded-full" />
+                </div>
             )}
 
             {loadMoreError && (

@@ -1,4 +1,5 @@
 import { getChapterBadge, getChapterTitle } from "../utils/formatChapter";
+import ChapterListSkeleton from "./ChapterListSkeleton";
 
 const ChapterList = ({
     chapters = [],
@@ -21,7 +22,7 @@ const ChapterList = ({
         </div>
 
         {loading ? (
-            <p className="text-gray-400 text-sm">Loading chapters...</p>
+            <ChapterListSkeleton />
         ) : chapters.length === 0 ? (
             <div 
                 className="

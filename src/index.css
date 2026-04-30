@@ -2,7 +2,7 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 
-
+/* Default: Midnight blue */
 :root {
   --primary: #93C5FD;
   --main: #bbd9ff;

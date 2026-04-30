@@ -6,6 +6,35 @@ import { useEffect, useState } from "react";
 import { getAllChapters, getManga } from "../api/manga";
 import { getMangaProgress, setMangaProgress } from "../utils/storageService";
 
+const getChapterNumericValue = (chapter) => {
+    const fromNumber = parseFloat(chapter?.number);
+    if (!Number.isNaN(fromNumber)) return fromNumber;
+
+    const title = String(chapter?.title || "");
+    const match = title.match(/chapter\s*([\d.]+)/i) || title.match(/(\d+(?:\.\d+)?)/);
+    if (!match) return Number.NEGATIVE_INFINITY;
+
+    const fromTitle = parseFloat(match[1]);
+    return Number.isNaN(fromTitle) ? Number.NEGATIVE_INFINITY : fromTitle;
+};
+
+const getDefaultStartChapterId = (chapterList) => {
+    if (!chapterList.length) return null;
+
+    // Prefer the earliest numeric chapter when available.
+    const numeric = chapterList
+        .map((ch) => ({ id: ch.id, value: getChapterNumericValue(ch) }))
+        .filter((item) => Number.isFinite(item.value));
+
+    if (numeric.length > 0) {
+        numeric.sort((a, b) => a.value - b.value);
+        return numeric[0].id;
+    }
+
+    // Fallback when every chapter number is missing: start from the end of the fetched list.
+    return chapterList[chapterList.length - 1]?.id || chapterList[0]?.id || null;
+};
+
 const MangaPage = () => {
     const navigate = useNavigate();
     const { mangaId } = useParams();
@@ -15,6 +44,9 @@ const MangaPage = () => {
     const [loading, setLoading] = useState(true);
     const [chapters, setChapters] = useState([]);
     const [chaptersLoading, setChaptersLoading] = useState(true);
+    const [expanded, setExpanded] = useState(false);
+
+    const status = manga?.status.trim().toLowerCase();
 
     useEffect(() => {
         if (!mangaId) return;
@@ -118,7 +150,7 @@ const MangaPage = () => {
     const getResumeChapterId = () => {
         if (!chapters.length) return null;
 
-        const defaultChapterId = chapters[0].id;
+        const defaultChapterId = getDefaultStartChapterId(chapters);
         const readingProgress = getReadingProgress();
         const savedChapterId = readingProgress.currentChapterId;
         const chapterExists = chapters.some((ch) => ch.id === savedChapterId);
@@ -128,6 +160,17 @@ const MangaPage = () => {
 
     const readingProgress = getReadingProgress();
     const resumeChapterId = getResumeChapterId();
+    const displayChapters = [...chapters].sort((a, b) => {
+        const na = getChapterNumericValue(a);
+        const nb = getChapterNumericValue(b);
+
+        if (na === nb) {
+            return String(b?.title || "").localeCompare(String(a?.title || ""));
+        }
+
+        return nb - na;
+    });
+
     // Pass manga metadata through route state so reader can persist it with progress updates.
     const readingState = manga
         ? {
@@ -167,7 +210,7 @@ const MangaPage = () => {
   return (
     <>
         <div className="flex-1">
-            <div className="pt-20 pb-16 px-4 sm:px-6">
+            <div className="pt-20 px-4 sm:px-6">
                 <div className="flex flex-col">
                     <div className="flex items-center gap-3 w-full mb-4">
                         <span className="text-[11px] font-black tracking-[0.2em] uppercase text-(--text-main)/70">
@@ -178,117 +221,172 @@ const MangaPage = () => {
 
                     <div 
                         className="
-                        flex flex-row gap-3 sm:gap-4 bg-white/35 dark:bg-black/30 border 
-                        border-white/20 dark:border-white/10 rounded-2xl 
-                        backdrop-blur-md shadow-2xl p-4 sm:p-6 "
+                        flex flex-col gap-1 bg-white/35 dark:bg-black/30 border 
+                        border-white/20 dark:border-white/10 rounded-2xl backdrop-blur-md shadow-2xl p-4 sm:p-6 "
                     >
-                        <div
-                            className="
-                            relative group cursor-pointer overflow-hidden rounded-lg 
-                            w-32 h-56 sm:w-42 sm:h-auto shrink-0 self-start sm:self-auto sm:mx-0"
-                            onClick={() => setOpen(true)}
-                        >
-                            <img 
-                                src={manga.imageFull}
-                                alt={manga.title} 
+                        {/* ROW: Thumbnail, title, meta and chapters count */}
+                        <div className="flex flex-row gap-4">
+                            <div
                                 className="
-                                w-full h-full sm:h-60 object-cover rounded 
-                                transition-transform duration-300 group-hover:scale-105"
-                            />
-
-                            <div 
-                                className="
-                                absolute inset-0 bg-black/0 group-hover:bg-black/60 
-                                transition-colors duration-300 flex items-center justify-center"
+                                relative group cursor-pointer overflow-hidden rounded-lg 
+                                w-32 h-full sm:w-42 sm:h-auto shrink-0 self-start sm:self-auto sm:mx-0"
+                                onClick={() => setOpen(true)}
                             >
-                                <Icon 
-                                    icon="humbleicons:expand"
+                                {/* Thumbnail */}
+                                <img 
+                                    src={manga.imageFull}
+                                    alt={manga.title} 
                                     className="
-                                    text-white text-4xl opacity-0 
-                                    group-hover:opacity-100 transition-opacity duration-300"
+                                    w-full h-full sm:h-60 object-cover rounded 
+                                    transition-transform duration-300 group-hover:scale-105"
+                                />
+
+                                <div 
+                                    className="
+                                    absolute inset-0 bg-black/0 group-hover:bg-black/60 
+                                    transition-colors duration-300 flex items-center justify-center"
+                                >
+                                    <Icon 
+                                        icon="humbleicons:expand"
+                                        className="
+                                        text-white text-4xl opacity-0 
+                                        group-hover:opacity-100 transition-opacity duration-300"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Manga title, author, status */}
+                            <div className="flex flex-col sm:h-60 min-w-0 flex-1">
+                                <h2 
+                                    className="
+                                    text-base sm:text-5xl font-extrabold tracking-tight 
+                                    mb-2 text-(--text-main)"
+                                >
+                                    {manga.title}
+                                </h2>
+
+                                <div 
+                                    className="
+                                    flex flex-wrap items-center gap-2 sm:gap-3 text-[10px] 
+                                    sm:text-[12px] font-semibold text-(--text-main)/70 mb-3"
+                                >
+                                    <span 
+                                        className="
+                                        px-2 py-0.5 sm:px-3 sm:py-1 rounded-full bg-black/5 
+                                        dark:bg-white/10 flex items-center gap-1 whitespace-nowrap"
+                                    >
+                                        <Icon icon="mdi:account-outline" className="text-sm"/>
+                                        {manga.author || "unknown"}
+                                    </span>
+                                    {manga.status && (
+                                        <div 
+                                            className="
+                                            flex items-center gap-2 px-2 py-0.5 sm:px-3 sm:py-1 
+                                            rounded-full bg-black/5 dark:bg-white/10"
+                                        >
+                                            <div 
+                                                className={`h-1.5 w-1.5 rounded-full
+                                                    ${status === "completed"
+                                                        ? "bg-blue-400"
+                                                        : status === "ongoing"
+                                                        ? "bg-green-400"
+                                                        : "bg-yellow-400"
+                                                    }
+                                                `} />
+                                            <div>{manga.status}</div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Chapter count */}
+                                <div className="mt-auto">
+                                    <div className="h-px w-full bg-black/10 dark:bg-white/10" />
+                                    <div className="pt-2 sm:pt-3 flex flex-wrap items-center gap-2 text-[10px] sm:text-xs font-medium text-(--text-main)/60">
+                                        <span className="px-2 py-0.5 rounded-full bg-black/5 dark:bg-white/10">
+                                            {chaptersLoading ? "Loading chapters..." : `${chapters.length} chapters`}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Single responsive action row for both mobile and desktop. */}
+                        <div className="mt-3 sm:mt-4 flex flex-row gap-2 sm:gap-3">
+                            <Link 
+                                to={resumeChapterId ? `/read/${mangaId}/${resumeChapterId}` : "#"}
+                                state={{
+                                    ...readingState, 
+                                    from: "mangaPage"
+                                }}
+                                className={`
+                                    flex-1 sm:flex-none text-center px-2 py-1 sm:px-4 
+                                    sm:py-2 text-sm font-medium rounded-md transition
+                                    ${chapters.length === 0
+                                        ? "bg-gray-400 dark:bg-gray-600 text-white cursor-not-allowed pointer-events-none"
+                                        : "bg-(--action) hover:bg-(--action-hover) text-white cursor-pointer"
+                                    }
+                                `}
+                            >
+                                Read
+                            </Link>
+
+                            <div className="flex-1 sm:flex-none min-w-0">
+                                <AddButton 
+                                    manga={manga} 
+                                    className="w-full sm:w-auto justify-center text-sm"
                                 />
                             </div>
                         </div>
 
-                        <div className="flex flex-col h-56 sm:h-60 min-w-0 flex-1">                        
-                            <h2 
-                                className="
-                                text-base sm:text-3xl font-extrabold tracking-tight 
-                                mb-2 text-(--text-main)"
-                            >
-                                {manga.title}
-                            </h2>
-
-                            <div 
-                                className="
-                                flex flex-wrap items-center gap-2 sm:gap-3 text-[10px] 
-                                sm:text-[12px] font-semibold text-(--text-main)/70 mb-3"
-                            >
-                                <span 
-                                    className="
-                                    px-2 py-0.5 sm:px-3 sm:py-1 rounded-full bg-black/5 
-                                    dark:bg-white/10 flex items-center gap-1 whitespace-nowrap"
-                                >
-                                    <Icon icon="mdi:account-outline" className="text-sm"/>
-                                    {manga.author || "unknown"}
-                                </span>
-                                {manga.status && (
-                                    <span 
-                                        className="
-                                        px-2 py-0.5 sm:px-3 sm:py-1 rounded-full 
-                                        bg-black/5 dark:bg-white/10 whitespace-nowrap"
-                                    >
-                                        {manga.status}
-                                    </span>
-                                )}
-                            </div>
-
-                            <p 
-                                className="
-                                mt-1 flex-1 overflow-y-auto overflow-x-hidden wrap-break-word 
-                                pr-2 text-sm sm:text-base text-(--text-muted)
-                                custom-scrollbar min-h-0 max-h-24 sm:max-h-40 md:max-h-none"
-                            >
-                                {manga.description || "No description available."}
-                            </p>
-
-                            {/* Single responsive action row for both mobile and desktop. */}
-                            <div className="mt-3 sm:mt-4 flex flex-row gap-2 sm:gap-3">
-                                <Link 
-                                    to={resumeChapterId ? `/read/${mangaId}/${resumeChapterId}` : "#"}
-                                    state={readingState}
-                                    className={`f
-                                        lex-1 sm:flex-none text-center px-2 py-1 sm:px-4 
-                                        sm:py-2 text-sm font-medium rounded-md transition
-                                        ${chapters.length === 0
-                                            ? "bg-gray-400 dark:bg-gray-600 text-white cursor-not-allowed pointer-events-none"
-                                            : "bg-(--action) hover:bg-(--action-hover) text-white cursor-pointer"
+                        {/* Description */}
+                        <div className="overflow-hidden">
+                            <div className="relative overflow-hidden">
+                                <p 
+                                    className={`
+                                        mt-1 text-sm sm:text-base leading-relaxed text-(--text-muted) transition-[max-height]
+                                        ${expanded 
+                                            ? "max-h-75 duration-200 ease-out" 
+                                            : "max-h-18 overflow-hidden duration-200 ease-in"
                                         }
                                     `}
                                 >
-                                    Read
-                                </Link>
+                                    {manga.description || "No description available."}
+                                </p>
 
-                                <div className="flex-1 sm:flex-none min-w-0">
-                                    <AddButton 
-                                        manga={manga} 
-                                        className="w-full sm:w-auto justify-center text-sm"
+                                {/* Fade effect */}
+                                {!expanded && (
+                                    <div
+                                        className="
+                                        pointer-events-none absolute inset-x-0 bottom-0 h-12
+                                        bg-linear-to-t from-(--main)/35 dark:from-(--main)/30 to-transparent"
                                     />
-                                </div>
+                                )}
                             </div>
+
+                            <button
+                                onClick={() => setExpanded(prev => !prev)}
+                                className="
+                                mt-2 mx-auto flex items-center justify-center p-2 rounded-full bg-(--component)/60 hover:bg-(--component) 
+                                transition duration-300 cursor-pointer text-lg"
+                            >
+                                <Icon 
+                                    icon={expanded ? "mdi:keyboard-arrow-up" : "mdi:keyboard-arrow-down"} 
+                                    className="transition-transform duration-300 "
+                                />
+                            </button>
                         </div>
                     </div>
 
                     {/* Genres */}
                     <div className="mt-4">
-                        <div className="flex flex-wrap gap-2">
+                        <div className="flex items-center gap-2 overflow-x-auto overflow-y-hidden custom-scrollbar">
                             {manga.genres && manga.genres.length > 0 ? (
                                 manga.genres.map((genre, index) => (
                                     <span 
                                         key={index} 
                                         className="
                                         bg-black/10 dark:bg-white/10 text-(--text-main)
-                                        text-[10px] font-black px-3 py-1 rounded-full"
+                                        text-[10px] font-black px-3 py-1 rounded-full whitespace-nowrap shrink-0"
                                     >
                                         {genre}
                                     </span>
@@ -302,21 +400,25 @@ const MangaPage = () => {
                     </div>
                 </div>
                 
-                
+                {/* Chapterlist */}
                 <ChapterList 
-                    chapters={[...chapters].reverse()}
+                    chapters={displayChapters}
                     loading={chaptersLoading}
                     currentChapterId={readingProgress.currentChapterId}
                     chapterProgress={readingProgress.chapters}
                     onChapterClick={(chapterId) =>
                         navigate(`/read/${manga.id}/${chapterId}`, {
-                            state: readingState,
+                            state: {
+                                ...readingState,
+                                from: "mangaPage"
+                            }
                         })
                     }
                 />
             </div>
         </div>
 
+        {/* Thumbnail modal */}
         {open && (
             <div
                 className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center"

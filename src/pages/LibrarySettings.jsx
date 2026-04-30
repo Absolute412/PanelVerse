@@ -104,9 +104,9 @@ function LibrarySettings() {
                             onChange={handleSortChange}
                             className="
                             w-full appearance-none rounded-lg border border-black/10 dark:border-white/15
-                            bg-white/80 dark:bg-slate-800 text-slate-900 dark:text-slate-100
+                            bg-(--component) text-slate-900 dark:text-slate-100
                             px-3 py-2 pr-10 outline-none shadow-sm
-                            focus:ring-2 focus:ring-(--action)/50"
+                            focus:ring-2 focus:ring-(--action)/50 cursor-pointer"
                         >
                             <option value="recently-added">Recently added</option>
                             <option value="recently-read">Recently read</option>
