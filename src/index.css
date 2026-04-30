@@ -147,3 +147,33 @@ html.dark {
 .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background-color: rgba(160, 160, 160, 0.7);
 }
+
+@keyframes reader-enter-from-right {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes reader-enter-from-left {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.reader-enter-from-right {
+  animation: reader-enter-from-right 240ms ease-out;
+}
+
+.reader-enter-from-left {
+  animation: reader-enter-from-left 240ms ease-out;
+}
