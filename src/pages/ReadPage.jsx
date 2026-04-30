@@ -124,9 +124,7 @@ const ReadPage = () => {
   const [showUi, setShowUi] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [pageMeta, setPageMeta] = useState({});
-  const [singlePageTransition, setSinglePageTransition] = useState("");
   const pageRefs = useRef([]);
-  const transitionTimeoutRef = useRef(null);
 
   const preloadedRef = useRef(new Set());
 
@@ -196,38 +194,16 @@ const ReadPage = () => {
   const goNext = useCallback(() => {
     if (!pages.length) return;
 
-    if (readingMode === "single") {
-      const enterFrom = direction === "rtl" ? "from-left" : "from-right";
-      setSinglePageTransition(enterFrom);
-      if (transitionTimeoutRef.current) {
-        clearTimeout(transitionTimeoutRef.current);
-      }
-      transitionTimeoutRef.current = setTimeout(() => {
-        setSinglePageTransition("");
-      }, 260);
-    }
-
     const delta = direction === "rtl" ? -1 : 1;
     const nextIdx = activeIdx + delta;
 
     if (!scrollToPage(nextIdx)) {
       goNextChapter();
     }
-  }, [pages.length, direction, activeIdx, scrollToPage, goNextChapter, readingMode]);
+  }, [pages.length, direction, activeIdx, scrollToPage, goNextChapter]);
 
   const goPrev = useCallback(() => {
     if (!pages.length) return;
-
-    if (readingMode === "single") {
-      const enterFrom = direction === "rtl" ? "from-right" : "from-left";
-      setSinglePageTransition(enterFrom);
-      if (transitionTimeoutRef.current) {
-        clearTimeout(transitionTimeoutRef.current);
-      }
-      transitionTimeoutRef.current = setTimeout(() => {
-        setSinglePageTransition("");
-      }, 260);
-    }
 
     const delta = direction === "rtl" ? 1 : -1;
     const prevIdx = activeIdx + delta;
@@ -235,7 +211,7 @@ const ReadPage = () => {
     if (!scrollToPage(prevIdx)) {
       goPrevChapter();
     }
-  }, [pages.length, direction, activeIdx, scrollToPage, goPrevChapter, readingMode]);
+  }, [pages.length, direction, activeIdx, scrollToPage, goPrevChapter]);
 
   const currentIsWide = pageMeta[activeIdx]?.isWide;
 
@@ -273,21 +249,14 @@ const ReadPage = () => {
 
     if (Math.abs(dx) < threshold) return;
 
-    const swipedLeft = dx < 0;
-    if (direction === "rtl") {
-      swipedLeft ? goPrev() : goNext();
+    if (dx < 0) {
+      // swipe left
+      direction === "rtl" ? goPrev() : goNext();
     } else {
-      swipedLeft ? goNext() : goPrev();
+      // swipe right
+      direction === "rtl" ? goNext() : goPrev();
     }
   };
-
-  useEffect(() => {
-    return () => {
-      if (transitionTimeoutRef.current) {
-        clearTimeout(transitionTimeoutRef.current);
-      }
-    };
-  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -442,9 +411,7 @@ const ReadPage = () => {
             <div className="fixed inset-x-0 top-0 bottom-12 z-10 flex pointer-events-none">
               <div
                 className="w-1/3 h-full pointer-events-auto"
-                onClick={() =>
-                  !showUi && (direction === "rtl" ? goNext() : goPrev())
-                }
+                onClick={() => !showUi && goPrev()}
               />
               <div
                 className="w-1/3 h-full pointer-events-auto"
@@ -452,9 +419,7 @@ const ReadPage = () => {
               />
               <div
                 className="w-1/3 h-full pointer-events-auto"
-                onClick={() =>
-                  !showUi && (direction === "rtl" ? goPrev() : goNext())
-                }
+                onClick={() => !showUi && goNext()}
               />
             </div>
 
@@ -501,29 +466,16 @@ const ReadPage = () => {
               setProgressBarPosition={setProgressBarPosition}
             />
 
-            {(readingMode === "single"
-              ? pages
-                  .map((page, i) => ({ page, i }))
-                  .filter(({ i }) => i === activeIdx)
-              : pages.map((page, i) => ({ page, i }))
-            ).map(({ page, i }) => {
+            {pages.map((page, i) => {
               const isHidden =
                 readingMode === "single" && i !== activeIdx;
               const isWide = pageMeta[i]?.isWide;
-              const singlePageTransitionClass =
-                readingMode === "single"
-                  ? singlePageTransition === "from-right"
-                    ? "reader-enter-from-right"
-                    : singlePageTransition === "from-left"
-                    ? "reader-enter-from-left"
-                    : "opacity-100"
-                  : "";
 
               return (
                 <div
                   key={i}
                   className={`
-                    relative w-full flex justify-center items-center px-2 transition-transform duration-300
+                    relative w-full flex justify-center items-center px-2
                     ${!loadedPages[i] ? "min-h-[70vh]" : ""}
                     ${isHidden ? "hidden" : ""}
                   `}
@@ -561,7 +513,6 @@ const ReadPage = () => {
                           : ""
                       }
                       ${loadedPages[i] ? "opacity-100" : "opacity-0"}
-                      ${singlePageTransitionClass}
                     `}
                     loading="lazy"
                     onLoad={(e) =>
