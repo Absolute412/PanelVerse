@@ -1,7 +1,6 @@
 import { Icon } from "@iconify/react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import ReaderSettingsModal from "./ReaderSettingsModal";
 import { getChapterLabel } from "../utils/formatChapter";
 
 function ShowUIBar ({ 

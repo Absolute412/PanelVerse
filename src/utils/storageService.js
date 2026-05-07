@@ -1,5 +1,6 @@
 const STORAGE_SCHEMA_VERSION = 2;
 const SCHEMA_KEY = "pv-schema-version";
+const DEFAULT_API = "http://localhost:5000/api";
 const MODE_KEY = "mode"
 const COLOR_THEME_KEY = "color-theme"
 const VALID_THEMES = ["default",  "purple", "neutral"];
@@ -35,20 +36,25 @@ const safeParseJSON = (raw, fallback) => {
 };
 
 const getImageProxyBase = () => {
-  const apiBase = import.meta.env.VITE_API_BASE || "http://localhost:5000/api";
+  // Keep this fallback aligned with src/api/manga.js so image URLs and API calls use the same backend.
+  const apiBase = import.meta.env.VITE_API_BASE || DEFAULT_API;
   if (typeof apiBase === "string" && apiBase.trim()) {
     return apiBase.replace(/\/$/, "");
   }
 
+  // Backward-compatible env: backend host without `/api` suffix.
   const backendBase = import.meta.env.VITE_BACKEND_BASE_URL;
   if (typeof backendBase === "string" && backendBase.trim()) {
     return `${backendBase.replace(/\/$/, "")}/api`;
   }
 
-  return "http://localhost:5000/api";
+  // Last-resort backend API path.
+  return DEFAULT_API;
 };
 
-const normalizeImageUrl = (raw) => {
+const IMAGE_PROXY_BASE = getImageProxyBase();
+
+export const normalizeImageUrl = (raw) => {
   if (!raw || typeof raw !== "string") return raw || "/placeholder.jpg";
 
   try {
@@ -59,10 +65,10 @@ const normalizeImageUrl = (raw) => {
       parsed.hostname === "127.0.0.1" ||
       parsed.hostname === "::1";
 
-    if (parsed.pathname === "/api/image" && (isRelativeProxyUrl || isLocalProxyHost)) {
+    if (parsed.pathname.startsWith("/api/image") && (isRelativeProxyUrl || isLocalProxyHost)) {
       const source = parsed.searchParams.get("url");
       if (!source) return raw;
-      return `${getImageProxyBase()}/image?url=${encodeURIComponent(source)}`;
+      return `${IMAGE_PROXY_BASE}/image?url=${encodeURIComponent(source)}`;
     }
 
     return parsed.toString();

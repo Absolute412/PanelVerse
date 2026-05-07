@@ -5,6 +5,19 @@ import ToggleTheme from "./ToggleTheme";
 import { PanelVerseLogo } from "./PanelVerseLogo";
 // "material-symbols:close-rounded"
 
+const dropdownLinks = [
+    {
+        "name": "Settings",
+        "icon": <Icon icon="line-md:cog-loop" />,
+        "path": "/settings"
+    },
+    {
+        "name": "About",
+        "icon": <Icon icon="mdi:about-circle-outline" />,
+        "path": "/about"
+    },
+];
+
 function DropDownMenu () {
     const [open, setOpen] = useState(false);
     const dropdownRef = useRef(null);
@@ -25,8 +38,8 @@ function DropDownMenu () {
             <button 
                 onClick={() => setOpen(!open)} 
                 className="
-                flex items-center justify-center cursor-pointer p-1 rounded-lg 
-                bg-(--component) transition-transform duration-200 "
+                flex items-center justify-center p-1 rounded-lg 
+                bg-(--component) transition-transform duration-200 cursor-pointer"
                 aria-expanded={open}
                 aria-label="Open user menu"
             >
@@ -56,30 +69,21 @@ function DropDownMenu () {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Link 
-                            to="/settings" 
-                            onClick={() => setOpen(false)}
-                            className="
-                            flex items-center justify-start gap-3 w-full px-3 py-2 text-sm font-medium 
-                            text-(--text-main)/90 hover:bg-(--component) rounded-lg transition-colors"
-                        >
-                            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-black/5 dark:bg-white/5">
-                                <Icon icon="line-md:cog-loop" className="text-lg"/>
-                            </span> 
-                            Settings
-                        </Link>
-                        <Link 
-                            to="/about" 
-                            onClick={() => setOpen(false)}
-                            className="
-                            flex items-center justify-start gap-3 w-full px-3 py-2 text-sm font-medium 
-                            text-(--text-main)/90 hover:bg-(--component) rounded-lg transition-colors"
-                        >
-                            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-black/5 dark:bg-white/5">
-                                <Icon icon="mdi:about-circle-outline" className="text-lg"/>
-                            </span> 
-                            About
-                        </Link>
+                        {dropdownLinks.map((item) => (
+                            <Link
+                                key={item.path}
+                                to={item.path}
+                                onClick={() => setOpen(false)}
+                                className="
+                                flex items-center justify-start gap-3 w-full px-3 py-2 hover:bg-(--component) rounded-lg transition-colors"
+                            >
+                                <span className="flex h-8 w-8 text-lg items-center justify-center rounded-lg bg-black/5 dark:bg-white/5">
+                                    {item.icon}
+                                </span>
+
+                                <p className="text-sm font-medium text-(--text-main)/90">{item.name}</p>
+                            </Link>
+                        ))}
                         <div className="h-px bg-black/10 dark:bg-white/10 my-1"/>
                         <ToggleTheme />
                     </div>

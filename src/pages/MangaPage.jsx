@@ -188,7 +188,7 @@ const MangaPage = () => {
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center min-h-screen">
-                <div className="w-10 h-10 border-4 border-(--action-hover) border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-10 h-10 border-4 border-(--action-hover) border-t-transparent rounded-full animate-spin" />
             </div>
         );
     }
@@ -287,10 +287,12 @@ const MangaPage = () => {
                                             <div 
                                                 className={`h-1.5 w-1.5 rounded-full
                                                     ${status === "completed"
-                                                        ? "bg-blue-400"
+                                                        ? "bg-blue-500"
                                                         : status === "ongoing"
-                                                        ? "bg-green-400"
-                                                        : "bg-yellow-400"
+                                                        ? "bg-green-500"
+                                                        : status === "hiatus"
+                                                        ? "bg-yellow-500"
+                                                        : "bg-red-500"
                                                     }
                                                 `} />
                                             <div>{manga.status}</div>

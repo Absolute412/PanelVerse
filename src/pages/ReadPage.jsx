@@ -262,6 +262,12 @@ const ReadPage = () => {
 
   const handleTouchStart = (e) => {
     if (showUi || isSwipeAnimating) return;
+
+    if (e.touches.length > 1) {
+      swipeMetaRef.current.isMultiTouch = true;
+      return;
+    }
+
     const touch = e.touches?.[0];
     if (!touch) return;
 
@@ -270,12 +276,22 @@ const ReadPage = () => {
       y: touch.clientY,
       time: Date.now(),
     };
-    swipeMetaRef.current = { isHorizontal: false };
+    swipeMetaRef.current = { isHorizontal: false, isMultiTouch: false };
     setIsSwiping(false);
   };
 
   const handleTouchMove = (e) => {
     if (readingMode !== "single" || isSwipeAnimating) return;
+
+    if (e.touches.length > 1) {
+      swipeMetaRef.current.isMultiTouch = true;
+      return;
+    }
+
+    if (swipeMetaRef.current.isMultiTouch) return;
+
+    const isZoomed = window.visualViewport?.scale > 1;
+    if (isZoomed) return;
 
     const touch = e.touches?.[0];
     if (!touch) return;
@@ -288,8 +304,6 @@ const ReadPage = () => {
       swipeMetaRef.current.isHorizontal = true;
       setIsSwiping(true);
     }
-
-    e.preventDefault();
 
     const leftPreviewIdx = getPreviewIndexForSwipe("left");
     const rightPreviewIdx = getPreviewIndexForSwipe("right");
@@ -305,6 +319,13 @@ const ReadPage = () => {
 
   const handleTouchEnd = (e) => {
     if (showUi || isSwipeAnimating) return;
+
+    if (swipeMetaRef.current.isMultiTouch) {
+      setIsSwiping(false);
+      setSwipeOffsetX(0);
+      return;
+    }
+
     const touch = e.changedTouches?.[0];
     if (!touch) return;
 
@@ -379,8 +400,6 @@ const ReadPage = () => {
     setIsSwipeAnimating(false);
     setSwipeOffsetX(0);
   };
-
-  const IMAGE_BASE = "h-full object-contain transition-opacity duration-150";
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -500,7 +519,7 @@ const ReadPage = () => {
     >
       {/* LOADING STATE (FULL CENTER FIX) */}
       {isReaderLoading ? (
-        <div className="flex-1 flex items-center justify-center">
+        <div className="flex-1 flex items-center justify-center min-h-screen">
           <div className="flex flex-col items-center justify-center gap-3">
             <div className="w-10 h-10 border-4 border-(--action-hover) border-t-transparent rounded-full animate-spin" />
             <p className="text-sm text-(--text-muted)">
@@ -510,7 +529,7 @@ const ReadPage = () => {
         </div>
       ) : (error || sourceResolveError) ? (
         /* ERROR STATE */
-        <div className="flex-1 flex items-center justify-center text-center">
+        <div className="flex-1 flex items-center justify-center text-center min-h-screen">
           <div className="flex flex-col gap-3">
             <p className="text-red-500 dark:text-red-600">{error || sourceResolveError}</p>
 
@@ -525,13 +544,13 @@ const ReadPage = () => {
       ) : (
         /* MAIN READER */
         <div 
-          className="flex-1 relative"
+          className="flex-1 relative mt-4 sm:mt-20"
           ref={readerViewportRef}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
           onTouchCancel={handleTouchCancel}
-          style={{ touchAction: readingMode === "single" ? "none" : "pan-y" }}
+          style={{ touchAction: readingMode === "single" ? "pan-y pinch-zoom" : "pan-y" }}
         >
           <div className={containerClass}>
             {/* TAP ZONES */}
@@ -736,7 +755,7 @@ const ReadPage = () => {
                             : scrollToPage(idx)
                         }
                         className={`
-                          rounded-full transition-all duration-200 cursor-pointer pointer-events-auto
+                          relative rounded-full transition-all duration-200 cursor-pointer pointer-events-auto group
                           ${progressBarPosition === "bottom"
                             ? "flex-1 h-1"
                             : "w-1.5 flex-1"
@@ -747,7 +766,24 @@ const ReadPage = () => {
                               : "bg-(--component) hover:bg-(--component-hover)"
                           }
                         `}
-                      />
+                      >
+                        <div 
+                          className={`
+                            absolute px-2 py-1 rounded-md
+                            leading-none text-xs text-(--text-main) whitespace-nowrap shadow-lg opacity-0 invisible
+                            transition-all duration-150 group-hover:opacity-100 group-hover:visible
+                            ${isActive ? "bg-(--action-alt)" : "bg-(--component)"}
+                            ${progressBarPosition === "bottom"
+                              ? "left-1/2 bottom-full mb-2 -translate-x-1/2"
+                              : progressBarPosition === "left"
+                              ? "left-full top-1/2 ml-2  -translate-y-1/2"
+                              : "right-full top-1/2 mr-2  -translate-y-1/2"
+                            }
+                          `}
+                        >
+                            {idx + 1}
+                          </div>
+                      </div>
                     )
                   })}
                 </div>

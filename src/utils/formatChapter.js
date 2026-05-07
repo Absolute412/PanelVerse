@@ -10,7 +10,14 @@ const isMissingNumber = (value) => {
 
 const isOneshotText = (text) => {
   const lower = cleanText(text).toLowerCase();
-  return lower.includes("oneshot") || lower.includes("one-shot") || lower.includes("one shot");
+  return (
+    lower.includes("oneshot") || 
+    lower.includes("one-shot") || 
+    lower.includes("one shot") ||
+    lower === "os" ||
+    lower === "special" ||
+    lower === "extra"
+  );
 };
 
 const isPlaceholderChapterTitle = (text) => {
@@ -36,14 +43,16 @@ export const getChapterBadge = (chapter) => {
   const number = cleanText(chapter?.number);
   const title = cleanText(chapter?.title);
 
-  if (isMissingNumber(number)) {
-    if (isOneshotText(title)) return "OS";
-
-    const fromTitle = extractChapterNumberFromText(title);
-    return fromTitle || "?";
+  if (isOneshotText(title) || isOneshotText(number)) {
+    return "OS";
   }
 
-  if (isOneshotText(number)) return "OS";
+  if (isMissingNumber(number)) {
+    const fromTitle = extractChapterNumberFromText(title);
+    if (fromTitle) return fromTitle;
+
+    return "1";
+  }
 
   return number;
 };
@@ -53,17 +62,17 @@ export const getChapterTitle = (chapter) => {
   if (title && !isPlaceholderChapterTitle(title)) return title;
 
   const badge = getChapterBadge(chapter);
-  if (badge === "OS") return "Oneshot";
+  if (badge === "OS") return "Chapter Oneshot";
   if (badge && badge !== "?") return `Chapter ${badge}`;
-  return "Chapter ?";
+  return "Chapter 1";
 };
 
 export const getChapterLabel = (chapter) => {
   const badge = getChapterBadge(chapter);
-  if (badge === "OS") return "Oneshot";
+  if (badge === "OS") return "Chapter Oneshot";
   if (badge && badge !== "?") return `Chapter ${badge}`;
 
   const title = cleanText(chapter?.title);
   if (title && !isPlaceholderChapterTitle(title)) return title;
-  return "Chapter ?";
+  return "Chapter 1";
 };

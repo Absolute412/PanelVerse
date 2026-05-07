@@ -4,6 +4,24 @@ import { useRef, useState } from "react";
 import { exportStorageData, importStorageData } from "../utils/storageService";
 import { PanelVerseLogo } from "../components/PanelVerseLogo";
 
+const settingsLink = [
+    {
+        "name": "Appearance",
+        "icon": <Icon icon="mdi:color" />,
+        "path": "/settings/appearance"
+    },
+    {
+        "name": "Library",
+        "icon": <Icon icon="mdi:library-bookmark-outline" />,
+        "path": "/settings/library"
+    },
+    {
+        "name": "About",
+        "icon": <Icon icon="mdi:about-circle-outline" />,
+        "path": "/about"
+    },
+];
+
 function Settings() {
     const navigate = useNavigate();
     const fileInputRef = useRef(null);
@@ -102,44 +120,22 @@ function Settings() {
                 </div>
 
                 <div className="space-y-3 pb-10">
-                    <Link
-                        to="/settings/appearance"
-                        className="
-                        w-full flex items-center justify-between bg-white/35 dark:bg-black/30 
-                        border border-white/20 dark:border-white/10 rounded-2xl shadow-2xl 
-                        hover:-translate-y-0.5 transition-transform backdrop-blur-md p-4 cursor-pointer"
-                    >
-                        <p className="text-base font-semibold text-(--text-main)">Appearance</p>
-                        <Icon 
-                            icon="ic:round-navigate-next" 
-                            className="text-xl text-gray-400" 
-                        />
-                    </Link>
-                    
-                    <Link 
-                        to="/settings/library" 
-                        className="
-                        w-full flex items-center justify-between bg-white/35 dark:bg-black/30 
-                        border border-white/20 dark:border-white/10 rounded-2xl shadow-2xl 
-                        hover:-translate-y-0.5 transition-transform backdrop-blur-md p-4 cursor-pointer"
-                    >
-                        <p className="text-base font-semibold text-(--text-main)">Library</p>
-                        <Icon 
-                            icon="ic:round-navigate-next" 
-                            className="text-xl text-gray-400" 
-                        />
-                    </Link>
-
-                    <Link 
-                        to="/about" 
-                        className="
-                        w-full flex items-center justify-between bg-white/35 dark:bg-black/30 
-                        border border-white/20 dark:border-white/10 rounded-2xl shadow-2xl 
-                        hover:-translate-y-0.5 transition-transform backdrop-blur-md p-4 cursor-pointer"
-                    >
-                        <p className="text-base font-semibold text-(--text-main)">About</p>
-                        <Icon icon="ic:round-navigate-next" className="text-xl text-gray-400" />
-                    </Link>
+                    {settingsLink.map((setting) => (
+                        <Link
+                            key={setting.path}
+                            to={setting.path}
+                            className="
+                            w-full flex items-center justify-between bg-white/35 dark:bg-black/30 
+                            border border-white/20 dark:border-white/10 rounded-2xl shadow-2xl 
+                            hover:-translate-y-0.5 transition-transform backdrop-blur-md p-4 cursor-pointer"
+                        >
+                            <div className="flex items-center gap-4">
+                                <span className="text-xl text-(--text-main)">{setting.icon}</span>
+                                <p className="text-base font-semibold text-(--text-main)">{setting.name}</p>
+                            </div>
+                            <Icon icon="ic:round-navigate-next" className="text-xl text-gray-400" />
+                        </Link>
+                    ))}
 
                     <div 
                         className="

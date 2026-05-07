@@ -42,7 +42,7 @@ function Hero() {
     useEffect(() => {
         if (!mangas.length) return;
 
-        intervalRef.current = setInterval(nextSlide, 7000);
+        intervalRef.current = setInterval(nextSlide, 10000);
         return () => clearInterval(intervalRef.current);
     }, [mangas]);
 
@@ -53,17 +53,18 @@ function Hero() {
     const activeManga = mangas[activeIndex];
     const isInLibrary = library.some(item => item.id === activeManga.id);
 
+    const status = activeManga?.status.trim().toLowerCase();
 
     const handleNext = () => {
         clearInterval(intervalRef.current);
         nextSlide();
-        intervalRef.current = setInterval(nextSlide, 7000);
+        intervalRef.current = setInterval(nextSlide, 10000);
     };
 
     const handlePrev = () => {
         clearInterval(intervalRef.current);
         prevSlide();
-        intervalRef.current = setInterval(nextSlide, 7000);
+        intervalRef.current = setInterval(nextSlide, 10000);
     };
 
     return (
@@ -106,7 +107,8 @@ function Hero() {
                     dark:border-white/10 rounded-2xl backdrop-blur-md shadow-2xl p-4 sm:p-6"
                 >
                     <div className="flex flex-row gap-3 sm:gap-4">
-                        <div className="relative w-32 h-56 sm:w-42 sm:h-auto shrink-0 self-start sm:self-auto sm:mx-0">
+                        {/* Tumbnail */}
+                        <div className="relative w-32 h-46 sm:w-42 sm:h-auto shrink-0 self-start sm:self-auto sm:mx-0">
                             <img
                                 src={activeManga.imageMedium}
                                 alt={activeManga.title}
@@ -123,89 +125,99 @@ function Hero() {
                             </div>
                         </div>
 
-                        <div className="flex flex-col h-56 sm:h-60 min-w-0 flex-1">
-                            <h1 
-                                className="
-                                text-base sm:text-3xl font-extrabold tracking-tight mb-2 
-                                text-(--text-main) line-clamp-1"
-                            >
-                                {activeManga.title}
-                            </h1>
+                        {/* Manga Details */}
+                        <div className="flex flex-col sm:justify-between h-46 sm:h-60 min-w-0 flex-1">
+                            <div className="flex flex-col">
+                                <h1 
+                                    className="
+                                    text-base sm:text-3xl font-extrabold tracking-tight mb-2 
+                                    text-(--text-main) line-clamp-1"
+                                >
+                                    {activeManga.title}
+                                </h1>
 
-                            <div 
-                                className="
-                                flex flex-wrap items-center gap-2 sm:gap-3 text-[10px] 
-                                sm:text-[12px] font-semibold text-(--text-main)/70 mb-3"
-                            >
-                                {activeManga.author && (
-                                    <span 
-                                        className="
-                                        px-2 py-0.5 sm:px-3 sm:py-1 rounded-full 
-                                        bg-black/5 dark:bg-white/10 whitespace-nowrap"
-                                    >
-                                        {activeManga.author}
-                                    </span>
-                                )}
-                                {activeManga.status && (
-                                    <span 
-                                        className="
-                                        px-2 py-0.5 sm:px-3 sm:py-1 rounded-full 
-                                        bg-black/5 dark:bg-white/10 whitespace-nowrap"
-                                    >
-                                        {activeManga.status}
-                                    </span>
-                                )}
-                                {activeManga.year && (
-                                    <span 
-                                        className="
-                                        px-2 py-0.5 sm:px-3 sm:py-1 rounded-full 
-                                        bg-black/5 dark:bg-white/10 whitespace-nowrap"
-                                    >
-                                        {activeManga.year}
-                                    </span>
-                                )}
-                                {activeManga.rating && (
-                                    <span 
-                                        className="
-                                        px-2 py-0.5 sm:px-3 sm:py-1 rounded-full 
-                                        bg-black/5 dark:bg-white/10 flex items-center gap-1 whitespace-nowrap"
-                                    >
-                                        <Icon icon="ic:round-star" />
-                                        {activeManga.rating}
-                                    </span>
-                                )}
+                                {/* Meta info: author, status, release year */}
+                                <div 
+                                    className="
+                                    flex flex-wrap items-center gap-2 sm:gap-3 text-[10px] 
+                                    sm:text-[12px] font-semibold text-(--text-main)/70 mb-3"
+                                >
+                                    {/* Author */}
+                                    {activeManga.author && (
+                                        <span 
+                                            className="
+                                            px-2 py-0.5 sm:px-3 sm:py-1 rounded-full 
+                                            bg-black/5 dark:bg-white/10 flex items-center gap-1 whitespace-nowrap"
+                                        >
+                                            <Icon icon="mdi:account-outline" className="text-sm" />
+                                            {activeManga.author}
+                                        </span>
+                                    )}
+
+                                    {/* Status */}
+                                    {activeManga.status && (
+                                        <div 
+                                            className="
+                                            flex items-center gap-2 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full 
+                                            bg-black/5 dark:bg-white/10 whitespace-nowrap"
+                                        >
+                                            <div 
+                                                className={`h-1.5 w-1.5 rounded-full
+                                                    ${status === "completed"
+                                                        ? "bg-blue-500"
+                                                        : status === "ongoing"
+                                                        ? "bg-green-500"
+                                                        : status === "hiatus"
+                                                        ? "bg-yellow-500"
+                                                        : "bg-red-500"
+                                                    }
+                                                `}></div>
+                                            <div>{activeManga.status}</div>
+                                        </div>
+                                    )}
+
+                                    {/* Release year */}
+                                    {activeManga.year && (
+                                        <span 
+                                            className="
+                                            px-2 py-0.5 sm:px-3 sm:py-1 rounded-full 
+                                            bg-black/5 dark:bg-white/10 whitespace-nowrap"
+                                        >
+                                            {activeManga.year}
+                                        </span>
+                                    )}
+                                </div>
+
+                                {/* Description */}
+                                <p className="mt-2 line-clamp-3 text-sm sm:text-base text-(--text-main)/80">
+                                    {activeManga.description || "No description available."}
+                                </p>
                             </div>
 
-                            <p 
-                                className="
-                                mt-1 flex-1 overflow-y-auto overflow-x-hidden wrap-break-word
-                                pr-1 sm:pr-2 text-sm sm:text-base text-(--text-main)/80
-                                custom-scrollbar min-h-0 max-h-24 sm:max-h-40 md:max-h-none "
-                            >
-                                {activeManga.description || "No description available."}
-                            </p>
-
-                            <div className="hidden sm:flex mt-3 sm:mt-4 flex-row gap-2 sm:gap-3">
-                                <Link
-                                    to={`/manga/${activeManga.id}`}
-                                    className="
-                                    flex-1 sm:flex-none text-center px-2 py-1 sm:px-4 sm:py-2 text-sm font-medium rounded-md transition
-                                    bg-(--action) hover:bg-(--action-hover) text-white cursor-pointer"
-                                >
-                                    Read Now
-                                </Link>
-                                <button
-                                    onClick={() =>
-                                        isInLibrary ? removeFromLibrary(activeManga.id) : addToLibrary(activeManga)
-                                    }
-                                    className="
-                                    flex-1 sm:flex-none min-w-0 justify-center px-2 py-1 sm:px-4 sm:py-2 text-sm rounded-md font-medium
-                                    bg-black/10 dark:bg-white/10 text-(--text-main) hover:bg-black/20 dark:hover:bg-white/20
-                                    flex items-center gap-2 cursor-pointer"
-                                >
-                                    <Icon icon={isInLibrary ? "ic:round-bookmark-remove" : "ic:round-bookmark-add"} />
-                                    <span className="hidden sm:inline">{isInLibrary ? "Remove from Library" : "Add to Library"}</span>
-                                </button>
+                            {/* Action buttons */}
+                            <div>
+                                <div className="hidden sm:flex mt-3 sm:mt-4 flex-row gap-2 sm:gap-3">
+                                    <Link
+                                        to={`/manga/${activeManga.id}`}
+                                        className="
+                                        flex-1 sm:flex-none text-center px-2 py-1 sm:px-4 sm:py-2 text-sm font-medium rounded-md transition
+                                        bg-(--action) hover:bg-(--action-hover) text-white cursor-pointer"
+                                    >
+                                        Read Now
+                                    </Link>
+                                    <button
+                                        onClick={() =>
+                                            isInLibrary ? removeFromLibrary(activeManga.id) : addToLibrary(activeManga)
+                                        }
+                                        className="
+                                        flex-1 sm:flex-none min-w-0 justify-center px-2 py-1 sm:px-4 sm:py-2 text-sm rounded-md font-medium
+                                        bg-black/10 dark:bg-white/10 text-(--text-main) hover:bg-black/20 dark:hover:bg-white/20
+                                        flex items-center gap-2 cursor-pointer"
+                                    >
+                                        <Icon icon={isInLibrary ? "ic:round-bookmark-remove" : "ic:round-bookmark-add"} />
+                                        <span className="hidden sm:inline">{isInLibrary ? "Remove from Library" : "Add to Library"}</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -213,7 +225,7 @@ function Hero() {
                     {/* Genres inside glass card */}
                     <div className="mt-1">
                         <div className="flex flex-wrap gap-2">
-                            {activeManga.genres?.slice(0, 6).map((genre, i) => (
+                            {activeManga.genres?.slice(0, 4).map((genre, i) => (
                                 <span
                                     key={i}
                                     className="bg-black/10 dark:bg-white/10 text-(--text-main)/70 text-[10px] font-black px-3 py-1 rounded-full"
@@ -224,8 +236,9 @@ function Hero() {
                         </div>
                     </div>
 
-                    {/* Bottom bar */}
+                    {/* Slider controls: pagination + navigation */}
                     <div className="hidden sm:flex items-center justify-between gap-3 mt-1 w-full opacity-90 text-(--text-main)">
+                        {/* pagination */}
                         <div className="flex items-center gap-2 shrink-0">
                             {mangas.map((_, i) => (
                                 <button
@@ -241,6 +254,7 @@ function Hero() {
                             ))}
                         </div>
 
+                        {/* navigation */}
                         <div className="flex items-center gap-4 w-24 justify-end shrink-0">
                             <button 
                                 onClick={handlePrev} 
@@ -256,6 +270,8 @@ function Hero() {
                             </button>
                         </div>
                     </div>
+
+                    {/* Actions buttons - small screens */}
                     <div className="flex sm:hidden basis-full items-center gap-2">
                         <Link
                             to={`/manga/${activeManga.id}`}
@@ -278,7 +294,10 @@ function Hero() {
                             <span>{isInLibrary ? "Remove" : "Add"}</span>
                         </button>
                     </div>
+
+                    {/* Slider controls: pagination + navigation - smaller screens */}
                     <div className="flex sm:hidden basis-full items-center justify-between gap-3 mt-1 w-full opacity-90 text-black dark:text-white">
+                        {/* pagination */}
                         <div className="flex items-center gap-2 shrink-0">
                             {mangas.map((_, i) => (
                                 <button
@@ -294,6 +313,7 @@ function Hero() {
                             ))}
                         </div>
 
+                        {/* navigation */}
                         <div className="flex items-center gap-2 w-auto justify-end shrink-0">
                             <button onClick={handlePrev} className="p-2 hover:bg-gray-200/60 dark:hover:bg-gray-500/40 cursor-pointer rounded-full">
                                 <Icon icon="ooui:next-rtl" />

@@ -52,7 +52,6 @@ function HeroSkeleton() {
                             <div className="h-5 w-16 bg-white/15 rounded-full animate-pulse" />
                             <div className="h-5 w-12 bg-white/15 rounded-full animate-pulse" />
                             <div className="h-5 w-18 bg-white/15 rounded-full animate-pulse" />
-                            <div className="h-5 w-14 bg-white/15 rounded-full animate-pulse" />
                         </div>
                     </div>
 

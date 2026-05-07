@@ -13,7 +13,7 @@ function MangaGrid({ mangas, loading }) {
         ))
         : mangas.map(manga => (
           <Link key={manga.id} to={`/manga/${manga.id}`}>
-            <Card manga={manga} />
+            <Card manga={manga} variant="feed" />
           </Link>
         ))
       }

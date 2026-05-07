@@ -5,7 +5,7 @@ function Footer() {
     const footerNav = [
         { name: "Home", path: "/" },
         { name: "About", path: "/about" },
-        { name: "Contact", path: "#" },
+        { name: "Settings", path: "/settings" },
     ];
     
     return(

@@ -24,11 +24,19 @@ function Library() {
 
         const getProgressStatus = (mangaId) => {
             const progress = getMangaProgress(mangaId);
-            const currentChapterId = progress.currentChapterId;
-            if (!currentChapterId) return "unread";
 
-            const chapter = progress.chapters?.[currentChapterId];
-            return chapter?.completed ? "completed" : "in-progress";
+            const chapters = progress.chapters || {};
+            const chapterList = Object.values(chapters);
+
+            if (chapterList.length === 0) return "unread";
+
+            const allCompleted = chapterList.every((ch) => ch.completed);
+            const anyStarted = chapterList.some((ch) => ch.lastPage > 0 || ch.completed);
+
+            if (allCompleted) return "completed";
+            if (anyStarted) return "in-progress";
+
+            return "unread";
         };
 
         const byFilter = library.filter((manga) => {
@@ -109,7 +117,7 @@ function Library() {
                                 key={manga.id} 
                                 to={`/manga/${manga.id}`}
                             >
-                                <Card manga={manga} />
+                                <Card manga={manga} variant="library" />
                             </Link>
                         ))}
                     </div>
