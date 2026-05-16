@@ -126,13 +126,34 @@ const ReadPage = () => {
   const [swipeOffsetX, setSwipeOffsetX] = useState(0);
   const [isSwiping, setIsSwiping] = useState(false);
   const [isSwipeAnimating, setIsSwipeAnimating] = useState(false);
+  const [isZoomed, setIsZoomed] = useState(false);
+
   const pageRefs = useRef([]);
   const swipeStartRef = useRef({ x: 0, y: 0, time: 0 });
   const swipeMetaRef = useRef({ isHorizontal: false });
   const swipeResetTimeoutRef = useRef(null);
   const readerViewportRef = useRef(null);
-
   const preloadedRef = useRef(new Set());
+
+  useEffect(() => {
+    const viewport = window.visualViewport;
+
+    if (!viewport) return;
+
+    const updateZoomState = () => {
+      setIsZoomed(viewport.scale > 1.01);
+    };
+
+    updateZoomState();
+
+    viewport.addEventListener("resize", updateZoomState);
+    viewport.addEventListener("scroll", updateZoomState);
+    
+    return () => {
+      viewport.removeEventListener("resize",updateZoomState);
+      viewport.removeEventListener("scroll", updateZoomState);
+    };
+  }, []);
 
   const {
     readingMode,
@@ -263,7 +284,9 @@ const ReadPage = () => {
   const handleTouchStart = (e) => {
     if (showUi || isSwipeAnimating) return;
 
-    if (e.touches.length > 1) {
+    if (isZoomed) return;
+
+    if (e.touches.length > 1 || isZoomed) {
       swipeMetaRef.current.isMultiTouch = true;
       return;
     }
@@ -290,8 +313,9 @@ const ReadPage = () => {
 
     if (swipeMetaRef.current.isMultiTouch) return;
 
-    const isZoomed = window.visualViewport?.scale > 1;
-    if (isZoomed) return;
+    if (isZoomed) {
+      return;
+    }
 
     const touch = e.touches?.[0];
     if (!touch) return;
@@ -318,6 +342,8 @@ const ReadPage = () => {
   };
 
   const handleTouchEnd = (e) => {
+    if (isZoomed) return;
+
     if (showUi || isSwipeAnimating) return;
 
     if (swipeMetaRef.current.isMultiTouch) {
@@ -550,11 +576,20 @@ const ReadPage = () => {
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
           onTouchCancel={handleTouchCancel}
-          style={{ touchAction: readingMode === "single" ? "pan-y pinch-zoom" : "pan-y" }}
+          style={{ 
+            touchAction: readingMode === "single" 
+              ? (isZoomed ? "auto" : "pan-y pinch-zoom")
+              : "pan-y" 
+          }}
         >
           <div className={containerClass}>
             {/* TAP ZONES */}
-            <div className="fixed inset-x-0 top-0 bottom-12 z-10 flex pointer-events-none">
+            <div 
+              className={`
+                fixed inset-x-0 top-0 bottom-12 z-10 flex
+                ${isZoomed ? "pointer-events-none" : ""}
+              `}
+            >
               <div
                 className="w-1/3 h-full pointer-events-auto"
                 onClick={() =>
@@ -619,7 +654,7 @@ const ReadPage = () => {
             {readingMode === "single" ? (() => {
               const prevIdx = getPreviewIndexForSwipe("right"); // swipe right = prev (physically)
               const nextIdx = getPreviewIndexForSwipe("left");  // swipe left = next (physically)
-              const showSwipeTrack = isSwiping || isSwipeAnimating || swipeOffsetX !== 0;
+              const showSwipeTrack = !isZoomed && (isSwiping || isSwipeAnimating || swipeOffsetX !== 0);
 
               const leftIdx = prevIdx;
               const rightIdx = nextIdx;

@@ -78,7 +78,7 @@ function ShowUIBar ({
                         </button>
                     </div>
                     <div className="leading-tight flex flex-col items-center text-center">
-                        <h3 className="font-bold text-lg text-(--text-main)">{chapterTitle}</h3>
+                        <h3 className="font-bold text-lg text-(--text-main) line-clamp-3">{chapterTitle}</h3>
 
                         {chapterLabel && (
                             <p className="text-xs text-(--text-muted) font-semibold truncate max-w-45">

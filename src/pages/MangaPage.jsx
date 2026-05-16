@@ -260,7 +260,8 @@ const MangaPage = () => {
                                 <h2 
                                     className="
                                     text-base sm:text-5xl font-extrabold tracking-tight 
-                                    mb-2 text-(--text-main)"
+                                    mb-2 text-(--text-main) sm:line-clamp-3 wrap-break-word"
+                                    title={manga.title}
                                 >
                                     {manga.title}
                                 </h2>

@@ -100,7 +100,7 @@ function Library() {
                 </div>
 
                 {library.length === 0 ? (
-                    <p className="text-(--text-muted) text-sm mt-4">
+                    <p className="text-(--text-muted) text-center text-sm mt-10">
                         Your library is empty. Add some manga to see them here.
                     </p>
                 ) : filteredLibrary.length === 0 ? (

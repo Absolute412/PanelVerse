@@ -92,7 +92,7 @@ const Card = ({ variant = "feed", manga, onClick, }) => {
                 {/* Manga title */}
                 <div className="p-2 sm:p-4 flex items-center">
                     <div className="flex-1 min-w-0">
-                        <h3 className="text-sm font-semibold text-(--text-main) truncate">
+                        <h3 className="text-sm font-semibold text-(--text-main) truncate" title={manga.title}>
                             {manga.title || "Unknown title"}
                         </h3>
                     </div>
